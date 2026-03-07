@@ -1,6 +1,6 @@
-import { getMovies } from "../services/moviesService.js";
-import { getTheatres } from "../services/theatresService.js";
-import { getShowings, createShowing } from "../services/showingsService.js";
+import {getMovies} from "../services/moviesService.js";
+import {getTheatres} from "../services/theatresService.js";
+import {getShowings, createShowing} from "../services/showingsService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMovies();
@@ -59,7 +59,7 @@ async function handleSubmit(event) {
     const price = document.getElementById("price").value;
 
     try {
-        await createShowing({ movieId, theatreId, startTime, price });
+        await createShowing({movieId, theatreId, startTime, price});
         document.getElementById("message").textContent = "Showing created!";
         await loadShowings();
     } catch (err) {
@@ -70,43 +70,88 @@ async function handleSubmit(event) {
 async function loadShowings() {
     const showings = await getShowings();
 
-    // 1. Group by theatre
-    const byTheatre = groupBy(showings, s => s.theatreNumber);
-
     const container = document.getElementById("showingsContainer");
     container.innerHTML = "";
 
-    Object.keys(byTheatre)
-        .sort((a, b) => a - b)
-        .forEach(theatreNumber => {
+    // 1. Group by date
+    const byDate = groupBy(showings, showing => extractDate(showing.startTime));
 
-            const theatreShowings = byTheatre[theatreNumber];
+    Object.keys(byDate)
+        .sort()
+        .forEach(date => {
+            const dateShowings = byDate[date];
 
-            // 2. Group by date inside each theatre
-            const byDate = groupBy(theatreShowings, s => extractDate(s.startTime));
+            const dateBlock = document.createElement("div");
+            dateBlock.classList.add("date-block");
 
-            const theatreBlock = document.createElement("div");
-            theatreBlock.classList.add("theatre-block");
+            const dateTitle = document.createElement("h3");
+            dateTitle.textContent = formatDate(date);
 
-            const theatreTitle = document.createElement("h2");
-            theatreTitle.textContent = `Theatre ${theatreNumber}`;
-            theatreBlock.appendChild(theatreTitle);
+            dateBlock.appendChild(dateTitle);
 
-            // 3. Render each date block
-            Object.keys(byDate)
-                .sort() // dates sort lexicographically correctly
-                .forEach(date => {
-                    const dateShowings = byDate[date];
+            // 2. Group by date
+            const byTheatre = groupBy(dateShowings, showing => showing.theatreNumber);
 
-                    // Sort by time
-                    dateShowings.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+            Object.keys(byTheatre)
+                .sort((a, b) => a - b)
+                .forEach(theatreNumber => {
+                    const theatreShowings = byTheatre[theatreNumber];
+                    const theatreTable = buildTheatreTable(theatreNumber, theatreShowings);
+                    dateBlock.appendChild(theatreTable)
+                })
 
-                    const dateTable = buildDateTable(date, dateShowings);
-                    theatreBlock.appendChild(dateTable);
-                });
+            container.appendChild(dateBlock);
+        })
+}
 
-            container.appendChild(theatreBlock);
-        });
+function buildTheatreTable(theatreNumber, showings) {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("theatre-block");
+
+    //title
+    const theatreTitle = document.createElement("h4");
+    theatreTitle.textContent = `Theatre ${theatreNumber}`;
+    wrapper.appendChild(theatreTitle);
+
+    //table
+    const table = document.createElement("table");
+    table.classList.add("showings-table");
+    wrapper.appendChild(table);
+
+    //THEAD
+    const thead = document.createElement("thead");
+    table.appendChild(thead);
+
+    const headerRow = thead.insertRow()
+
+    const headers = ["Movie", "Start Time", "Price"];
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+
+    //TBODY
+    const tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+
+    showings.forEach(showing => {
+        const row = tbody.insertRow();
+        const movieCell = document.createElement("td");
+        movieCell.textContent = showing.movieTitle;
+
+        const timeCell = document.createElement("td");
+        timeCell.textContent = formatTime(showing.startTime);
+
+        const priceCell = document.createElement("td");
+        priceCell.textContent = `${showing.price} kr`;
+
+        row.appendChild(movieCell);
+        row.appendChild(timeCell);
+        row.appendChild(priceCell);
+    });
+
+    return wrapper;
 }
 
 function groupBy(list, keyGetter) {
@@ -117,40 +162,6 @@ function groupBy(list, keyGetter) {
         map[key].push(item);
     });
     return map;
-}
-
-function buildDateTable(date, showings) {
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("date-block");
-
-    const title = document.createElement("h3");
-    title.textContent = formatDate(date);
-    wrapper.appendChild(title);
-
-    const table = document.createElement("table");
-    table.classList.add("showings-table");
-
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th>Movie</th>
-                <th>Start Time</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${showings.map(s => `
-                <tr>
-                    <td>${s.movieTitle}</td>
-                    <td>${formatTime(s.startTime)}</td>
-                    <td>${s.price} kr</td>
-                </tr>
-            `).join("")}
-        </tbody>
-    `;
-
-    wrapper.appendChild(table);
-    return wrapper;
 }
 
 function extractDate(dateTimeString) {
