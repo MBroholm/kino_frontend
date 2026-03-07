@@ -170,7 +170,7 @@ function extractDate(dateTimeString) {
 
 function formatDate(dateString) {
     const d = new Date(dateString);
-    return d.toLocaleDateString("da-DK", {
+    return d.toLocaleDateString("en-GB", {
         weekday: "long",
         day: "numeric",
         month: "long"
@@ -179,7 +179,7 @@ function formatDate(dateString) {
 
 function formatTime(dateTimeString) {
     const d = new Date(dateTimeString);
-    return d.toLocaleTimeString("da-DK", {
+    return d.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit"
     });
