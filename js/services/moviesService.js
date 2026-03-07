@@ -1,5 +1,5 @@
-import { fetchJsonAdmin } from "../api.js";
+import { fetchJson } from "../api.js";
 
 export function getMovies() {
-    return fetchJsonAdmin("http://localhost:8080/api/movies");
+    return fetchJson("http://localhost:8080/api/movies");
 }

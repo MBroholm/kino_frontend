@@ -1,0 +1,36 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+form {
+
+}
+
+label {
+
+}
+
+button {
+
+}
+
+.theatre-block {
+    margin-bottom: 40px;
+}
+
+.showings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.showings-table th,
+.showings-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.showings-table th {
+    background: #f0f0f0;
+    text-align: left;
+}
