@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule Showings</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<h1>Schedule a New Showing</h1>
+
+<form id="showingForm">
+    <label>Movie:</label>
+    <select id="movieSelect"></select>
+
+    <label>Theatre:</label>
+    <select id="theatreSelect"></select>
+
+    <label>Start Time:</label>
+    <input type="datetime-local" id="startTime">
+
+    <label>Price:</label>
+    <input type="number" id="price" min="0" step="1">
+
+    <button type="submit">Create Showing</button>
+</form>
+
+<div id="message"></div>
+
+<script type="module" src="../js/pages/showings.js"></script>
+</body>
+</html>

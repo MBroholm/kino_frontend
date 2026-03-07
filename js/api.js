@@ -4,7 +4,7 @@ const BASE_URL = "http://localhost:8080";
 // Generic JSON helpers
 // -------------------------------
 
-async function fetchJson(url) {
+export async function fetchJson(url) {
     let response;
 
     try {
@@ -24,7 +24,7 @@ async function fetchJson(url) {
     }
 }
 
-async function postJson(url, data, method = "POST") {
+export async function postJson(url, data, method = "POST") {
     const response = await fetch(url, {
         method,
         headers: {"Content-Type": "application/json"},
@@ -59,7 +59,7 @@ async function postJson(url, data, method = "POST") {
 // Admin JSON helpers
 // -------------------------------
 
-async function fetchJsonAdmin(url) {
+export async function fetchJsonAdmin(url) {
     const token = localStorage.getItem("token");
     let response;
 
@@ -83,7 +83,7 @@ async function fetchJsonAdmin(url) {
     }
 }
 
-async function postJsonAdmin(url, data, method = "POST") {
+export async function postJsonAdmin(url, data, method = "POST") {
     const token = localStorage.getItem("token");
     const response = await fetch(url, {
         method,
@@ -115,7 +115,7 @@ async function postJsonAdmin(url, data, method = "POST") {
         : response.text();
 }
 
-async function requestDeleteAdmin(url) {
+export async function requestDeleteAdmin(url) {
     const token = localStorage.getItem("token");
     let response;
 
@@ -148,7 +148,7 @@ async function requestDeleteAdmin(url) {
 // DELETE helper
 // -------------------------------
 
-async function requestDelete(url) {
+export async function requestDelete(url) {
     let response;
 
     try {
