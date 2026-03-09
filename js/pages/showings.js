@@ -124,7 +124,7 @@ function buildTheatreTable(theatreNumber, showings) {
 
     const headerRow = thead.insertRow()
 
-    const headers = ["Movie", "Start Time", "Price"];
+    const headers = ["Movie", "Start Time", "End Time", "Price"];
     headers.forEach(header => {
         const th = document.createElement("th");
         th.textContent = header;
@@ -137,17 +137,22 @@ function buildTheatreTable(theatreNumber, showings) {
 
     showings.forEach(showing => {
         const row = tbody.insertRow();
+
         const movieCell = document.createElement("td");
         movieCell.textContent = showing.movieTitle;
 
-        const timeCell = document.createElement("td");
-        timeCell.textContent = formatTime(showing.startTime);
+        const startTimeCell = document.createElement("td");
+        startTimeCell.textContent = formatTime(showing.startTime);
+
+        const endTimeCell = document.createElement("td");
+        endTimeCell.textContent = formatTime(showing.endTime);
 
         const priceCell = document.createElement("td");
         priceCell.textContent = `${showing.price} kr`;
 
         row.appendChild(movieCell);
-        row.appendChild(timeCell);
+        row.appendChild(startTimeCell);
+        row.appendChild(endTimeCell)
         row.appendChild(priceCell);
     });
 
