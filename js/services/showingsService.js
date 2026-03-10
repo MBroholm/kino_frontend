@@ -5,5 +5,5 @@ export function getShowings() {
 }
 
 export function createShowing(data) {
-    return postJsonAdmin("http://localhost:8080/api/showings", data);
+    return postJsonAdmin("http://localhost:8080/api/admin/showings", data);
 }
