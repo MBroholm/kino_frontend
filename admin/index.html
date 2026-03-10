@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script type="module">
+    // Check login status
+    import {isLoggedIn} from "../js/auth.js";
+
+    if (isLoggedIn()) {
+        // User is logged in → go to dashboard
+        window.location.href = "dashboard.html";
+    } else {
+        // Not logged in → go to login page
+        window.location.href = "login.html";
+    }
+</script>
+</body>
+</html>
