@@ -163,7 +163,7 @@ function buildTheatreTable(theatreNumber, showings) {
 
         const editLink = document.createElement("a");
         editLink.textContent = "Edit";
-        editLink.href = `/admin/edit-showing?id=${showing.showingId}`;
+        editLink.href = `/admin/edit-showing.html?id=${showing.showingId}`;
         actionCell.appendChild(editLink);
 
         const deleteLink = document.createElement("a");
