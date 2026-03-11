@@ -1,6 +1,8 @@
 # Use a lightweight Nginx image
 FROM nginx:alpine
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Set working directory inside the container
 WORKDIR /usr/share/nginx/html
 
