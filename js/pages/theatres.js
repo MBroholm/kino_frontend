@@ -17,8 +17,11 @@ async function loadTheatres() {
             <h3>Theatre ${theatre.theatreNumber}</h3>
             <p>Number of rows: ${theatre.numberOfRows}</p>
             <p>Seats per row: ${theatre.seatsPerRow}</p>
-           <button class="btn-delete" onclick="handleDelete(${theatre.theatreId})">Delete</button>            
         `;
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => handleDelete(theatre.theatreId));
+        theatreDiv.appendChild(deleteButton);
         container.appendChild(theatreDiv);
     });
 }
