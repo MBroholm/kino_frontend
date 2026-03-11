@@ -1,6 +1,8 @@
 const params = new URLSearchParams(window.location.search);
 const showingId = params.get("id");
 
+console.log("showingId:", showingId);
+
 import {getShowingById, updateShowing, deleteShowing} from "../services/showingsService.js";
 import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
