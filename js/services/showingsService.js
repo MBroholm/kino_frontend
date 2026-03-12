@@ -1,9 +1,21 @@
-import { fetchJson, postJsonAdmin } from "../api.js";
+import {fetchJson, postJsonAdmin, putJsonAdmin, requestDeleteAdmin} from "../api.js";
 
 export function getShowings() {
-    return fetchJson("http://localhost:8080/api/showings");
+    return fetchJson("/api/showings");
 }
 
 export function createShowing(data) {
-    return postJsonAdmin("http://localhost:8080/api/showings", data);
+    return postJsonAdmin("/api/admin/showings", data);
+}
+
+export function getShowingById(id) {
+    return fetchJson(`/api/showings/${id}`);
+}
+
+export function updateShowing(id, data) {
+    return putJsonAdmin(`/api/admin/showings/${id}`, data);
+}
+
+export function deleteShowing(id) {
+    return requestDeleteAdmin(`/api/admin/showings/${id}`);
 }

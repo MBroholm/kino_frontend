@@ -1,6 +1,6 @@
 import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
-import {getShowings, createShowing} from "../services/showingsService.js";
+import {getShowings, createShowing, deleteShowing} from "../services/showingsService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMovies();
@@ -60,10 +60,14 @@ async function handleSubmit(event) {
 
     try {
         await createShowing({movieId, theatreId, startTime, price});
-        document.getElementById("message").textContent = "Showing created!";
+        const message = document.getElementById("message");
+        message.textContent = "Showing created!";
+        message.style.color = "green";
         await loadShowings();
     } catch (err) {
-        document.getElementById("message").textContent = "Error: " + err.message;
+        const message = document.getElementById("message");
+        message.textContent = "Error: " + err.message;
+        message.style.color = "red";
     }
 }
 
@@ -124,7 +128,7 @@ function buildTheatreTable(theatreNumber, showings) {
 
     const headerRow = thead.insertRow()
 
-    const headers = ["Movie", "Start Time", "Price"];
+    const headers = ["Movie", "Start Time", "End Time", "Price", "Action"];
     headers.forEach(header => {
         const th = document.createElement("th");
         th.textContent = header;
@@ -137,21 +141,58 @@ function buildTheatreTable(theatreNumber, showings) {
 
     showings.forEach(showing => {
         const row = tbody.insertRow();
+
         const movieCell = document.createElement("td");
         movieCell.textContent = showing.movieTitle;
+        row.appendChild(movieCell);
 
-        const timeCell = document.createElement("td");
-        timeCell.textContent = formatTime(showing.startTime);
+        const startTimeCell = document.createElement("td");
+        startTimeCell.textContent = formatTime(showing.startTime);
+        row.appendChild(startTimeCell);
+
+        const endTimeCell = document.createElement("td");
+        endTimeCell.textContent = formatTime(showing.endTime);
+        row.appendChild(endTimeCell)
 
         const priceCell = document.createElement("td");
         priceCell.textContent = `${showing.price} kr`;
-
-        row.appendChild(movieCell);
-        row.appendChild(timeCell);
         row.appendChild(priceCell);
+
+        const actionCell = document.createElement("td");
+        row.appendChild(actionCell);
+
+        const editLink = document.createElement("a");
+        editLink.textContent = "Edit";
+        editLink.href = `edit-showing.html?id=${showing.showingId}`;
+        actionCell.appendChild(editLink);
+
+        const deleteLink = document.createElement("a");
+        deleteLink.textContent = "Delete";
+        deleteLink.href = "#";
+        deleteLink.style.marginLeft = "12px";
+        deleteLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            handleDelete(showing.showingId);
+        });
+        actionCell.appendChild(deleteLink);
     });
 
     return wrapper;
+}
+
+async function handleDelete(showingId) {
+    const confirmed = confirm("Are you sure you want to delete this showing?");
+
+    if (!confirmed) {
+        return; // user cancelled
+    }
+
+    try {
+        await deleteShowing(showingId);
+        window.location.href = "showings.html";
+    } catch (err) {
+        document.getElementById("message").textContent = "Error: " + err.message;
+    }
 }
 
 function groupBy(list, keyGetter) {

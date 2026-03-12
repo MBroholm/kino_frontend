@@ -1,14 +1,18 @@
-const BASE_URL = "http://localhost:8080";
+const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+const BASE_URL = isLocalhost ? "http://localhost:8080" : "";
 
 // -------------------------------
 // Generic JSON helpers
 // -------------------------------
 
-export async function fetchJson(url) {
+export async function fetchJson(endpoint) {
     let response;
 
     try {
-        response = await fetch(url);
+        response = await fetch(BASE_URL + endpoint);
     } catch (err) {
         throw new Error(`Network error: ${err.message}`);
     }
@@ -24,8 +28,8 @@ export async function fetchJson(url) {
     }
 }
 
-export async function postJson(url, data, method = "POST") {
-    const response = await fetch(url, {
+export async function postJson(endpoint, data, method = "POST") {
+    const response = await fetch(BASE_URL + endpoint, {
         method,
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data)
@@ -55,16 +59,17 @@ export async function postJson(url, data, method = "POST") {
         : response.text();
 }
 
+
 // -------------------------------
 // Admin JSON helpers
 // -------------------------------
 
-export async function fetchJsonAdmin(url) {
+export async function fetchJsonAdmin(endpoint) {
     const token = localStorage.getItem("token");
     let response;
 
     try {
-        response = await fetch(url, {
+        response = await fetch(BASE_URL + endpoint, {
             headers: { "Authorization": `Bearer ${token}` }
         });
     } catch (err) {
@@ -72,7 +77,7 @@ export async function fetchJsonAdmin(url) {
     }
 
     if (!response.ok) {
-        if (response.status === 401) window.location.href = "/admin/login.html";
+        if (response.status === 401) window.location.href = "login.html";
         throw new Error(`HTTP error ${response.status}`);
     }
 
@@ -83,9 +88,10 @@ export async function fetchJsonAdmin(url) {
     }
 }
 
-export async function postJsonAdmin(url, data, method = "POST") {
+export async function postJsonAdmin(endpoint, data, method = "POST") {
     const token = localStorage.getItem("token");
-    const response = await fetch(url, {
+
+    const response = await fetch(BASE_URL + endpoint, {
         method,
         headers: {
             "Content-Type": "application/json",
@@ -95,10 +101,13 @@ export async function postJsonAdmin(url, data, method = "POST") {
     });
 
     if (!response.ok) {
-        if (response.status === 401) window.location.href = "/admin/login.html";
+        if (response.status === 401) window.location.href = "login.html";
+
         let errorMessage = `HTTP error ${response.status}`;
+
         try {
             const contentType = response.headers.get("content-type");
+
             if (contentType?.includes("application/json")) {
                 const error = await response.json();
                 errorMessage = error.message ?? JSON.stringify(error);
@@ -106,21 +115,32 @@ export async function postJsonAdmin(url, data, method = "POST") {
                 errorMessage = await response.text();
             }
         } catch {}
+
         throw new Error(errorMessage);
     }
 
     const contentType = response.headers.get("content-type");
+
     return contentType?.includes("application/json")
         ? response.json()
         : response.text();
 }
 
-export async function requestDeleteAdmin(url) {
+export async function putJsonAdmin(endpoint, data) {
+    return postJsonAdmin(endpoint, data, "PUT");
+}
+
+
+// -------------------------------
+// DELETE helpers
+// -------------------------------
+
+export async function requestDeleteAdmin(endpoint) {
     const token = localStorage.getItem("token");
     let response;
 
     try {
-        response = await fetch(url, {
+        response = await fetch(BASE_URL + endpoint, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${token}` }
         });
@@ -128,10 +148,10 @@ export async function requestDeleteAdmin(url) {
         throw new Error(`Network error: ${err.message}`);
     }
 
-    //If token is missing or expired, redirect to login page
     if (!response.ok) {
-        if (response.status === 401) window.location.href = "/admin/login.html";
-        throw new Error(`HTTP error ${response.status}`);
+        if (response.status === 401) window.location.href = "login.html";
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || `HTTP error ${response.status}`);
     }
 
     if (response.status === 204) return null;
@@ -144,15 +164,11 @@ export async function requestDeleteAdmin(url) {
 }
 
 
-// -------------------------------
-// DELETE helper
-// -------------------------------
-
-export async function requestDelete(url) {
+export async function requestDelete(endpoint) {
     let response;
 
     try {
-        response = await fetch(url, { method: "DELETE" });
+        response = await fetch(BASE_URL + endpoint, { method: "DELETE" });
     } catch (err) {
         throw new Error(`Network error: ${err.message}`);
     }
