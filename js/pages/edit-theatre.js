@@ -8,7 +8,7 @@ import {getTheatreById, updateTheatre, } from "../services/theatresService.js";
 document.addEventListener("DOMContentLoaded", async () => {
     const theatre = await getTheatreById(theatreId);
 
-
+    document.getElementById("theatreNumber").value = theatre.theatreNumber;
     document.getElementById("numberOfRows").value = theatre.numberOfRows;
     document.getElementById("seatsPerRow").value = theatre.seatsPerRow;
     document.getElementById("editTheatreForm").addEventListener("submit", handleSubmit);
@@ -17,11 +17,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function handleSubmit(event) {
     event.preventDefault();
 
+    const theatreNumber = document.getElementById("theatreNumber").value;
     const numberOfRows = document.getElementById("numberOfRows").value;
     const seatsPerRow = document.getElementById("seatsPerRow").value;
 
     try {
-        await updateTheatre(theatreId, {theatreId, numberOfRows, seatsPerRow});
+        await updateTheatre(theatreId, {theatreNumber, numberOfRows, seatsPerRow});
         window.location.href = "theatres.html";
     } catch (err) {
         document.getElementById("message").textContent = "Error: " + err.message;
