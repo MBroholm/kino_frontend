@@ -78,15 +78,19 @@ function groupByRow(seats) {
     // unpacks all map entries into a regular array so we can sort them
     // sorts the entries by row number (the key of the map) in ascending order (left to right)
     // places the now sorted array of entries into a map
+    // sorts rows per row number.
     const entries = [...map.entries()];
     entries.sort((a, b) => a[0] - b[0]);
     const sorted = new Map(entries);
 
+
+    // sorts the seats in each row by seat number in ascending order (left to right)
+    // sorts seats per row.
     sorted.forEach(rowSeats => rowSeats.sort((a, b) => a.seatNumber - b.seatNumber));
     return sorted;
 
 }
 
-//
+
 
 
