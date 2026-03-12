@@ -8,12 +8,12 @@ export async function login(username, password) {
     //The token stays in browsers local storage until it expires or clears browser cache.
     localStorage.setItem("token", data.token);
     //Redirects to admin dashboard
-    window.location.href = "/admin/dashboard.html";
+    window.location.href = "dashboard.html";
 }
 
 export function logout() {
     localStorage.removeItem("token");
-    window.location.href = "/admin/login.html";
+    window.location.href = "login.html";
 }
 
 export function isLoggedIn() {

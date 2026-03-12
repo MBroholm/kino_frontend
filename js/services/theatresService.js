@@ -7,3 +7,5 @@ export function createTheatre(theatre) { return postJsonAdmin("/api/admin/theatr
 export function updateTheatre(id, theatre) { return putJsonAdmin(`/api/admin/theatres/${id}`, theatre); }
 
 export function deleteTheatre(theatreId) { return requestDeleteAdmin(`/api/admin/theatres/${theatreId}`); }
+
+export function getTheatreById(theatreId) { return fetchJsonAdmin(`/api/admin/theatres/${theatreId}`); }
