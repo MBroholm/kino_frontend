@@ -150,7 +150,8 @@ export async function requestDeleteAdmin(endpoint) {
 
     if (!response.ok) {
         if (response.status === 401) window.location.href = "/admin/login.html";
-        throw new Error(`HTTP error ${response.status}`);
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || `HTTP error ${response.status}`);
     }
 
     if (response.status === 204) return null;
