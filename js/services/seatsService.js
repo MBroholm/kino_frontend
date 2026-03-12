@@ -1,6 +1,6 @@
-import { fetchJson} from "../api.js";
+import { fetchJson } from "../api.js";
 
 export function getSeatsForShowing(showingId) {
-    return fetchJson(`http://localhost:8080/api/showings/${showingId}/seats`);
+    return fetchJson(`/api/showings/${showingId}/seats`);
 }
 
