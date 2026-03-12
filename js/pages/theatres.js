@@ -57,6 +57,8 @@ async function handleDelete(theatreId) {
         await (deleteTheatre(theatreId));
         window.location.href = "theatres.html";
     } catch (err) {
-        document.getElementById("message").textContent = "Error: " + err.message;
+        const message = document.getElementById("message");
+        message.textContent = "Error: " + err.message;
+        message.style.color = "red";
     }
 }
