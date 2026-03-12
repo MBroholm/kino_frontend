@@ -18,6 +18,12 @@ async function loadTheatres() {
             <p>Number of rows: ${theatre.numberOfRows}</p>
             <p>Seats per row: ${theatre.seatsPerRow}</p>
         `;
+        const editButton = document.createElement("button");
+        editButton.textContent = "Edit";
+        editButton.addEventListener("click", () => window.location.href = `edit-theatre.html?id=${theatre.theatreId}`);
+        theatreDiv.appendChild(editButton);
+        theatreDiv.appendChild(document.createElement("br"));
+
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Delete";
         deleteButton.addEventListener("click", () => handleDelete(theatre.theatreId));

@@ -77,7 +77,7 @@ export async function fetchJsonAdmin(endpoint) {
     }
 
     if (!response.ok) {
-        if (response.status === 401) window.location.href = "/admin/login.html";
+        if (response.status === 401) window.location.href = "login.html";
         throw new Error(`HTTP error ${response.status}`);
     }
 
@@ -101,7 +101,7 @@ export async function postJsonAdmin(endpoint, data, method = "POST") {
     });
 
     if (!response.ok) {
-        if (response.status === 401) window.location.href = "/admin/login.html";
+        if (response.status === 401) window.location.href = "login.html";
 
         let errorMessage = `HTTP error ${response.status}`;
 
@@ -149,7 +149,7 @@ export async function requestDeleteAdmin(endpoint) {
     }
 
     if (!response.ok) {
-        if (response.status === 401) window.location.href = "/admin/login.html";
+        if (response.status === 401) window.location.href = "login.html";
         const errorMessage = await response.text();
         throw new Error(errorMessage || `HTTP error ${response.status}`);
     }
