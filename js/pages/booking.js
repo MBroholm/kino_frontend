@@ -1,4 +1,4 @@
-import { getSeatsForShowing} from "../services/seatsService.js";
+import {getSeatsForShowing} from "../services/seatsService.js";
 import {renderSeatMap} from "../seatmap.js";
 
 // URLSearchParams(window.location.search) is a built-in script
@@ -11,6 +11,7 @@ const showingId = params.get("showingId");
 // let, because we default to 2 tickets, but
 // can change based on user input in dropdown menu
 // how many seats the user is allowed to select
+const MAX_TICKETS_PER_BOOKING = 9
 const selectedIds = new Set();
 let allSeats = [];
 let maxTickets = 2;
@@ -56,9 +57,9 @@ function refresh() {
     updateSummary();
 }
 
-function populateTicketDropdown(){
+function populateTicketDropdown() {
     const select = document.getElementById("ticketCount");
-    for (let i = 1; i <= 9; i++) {
+    for (let i = 1; i <= MAX_TICKETS_PER_BOOKING; i++) {
         const option = document.createElement("option");
         option.value = i;
         option.textContent = i;
@@ -67,7 +68,7 @@ function populateTicketDropdown(){
     }
 }
 
-function updateSummary(){
+function updateSummary() {
     const summary = document.getElementById("summary");
     const btn = document.getElementById("confirmBtn")
     const count = selectedIds.size;
