@@ -1,5 +1,3 @@
-console.log("test")
-
 // Extract movieId from URL: movie.html?id=3
 const urlParams = new URLSearchParams(window.location.search);
 const movieId = urlParams.get("id");
