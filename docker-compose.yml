@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: kino_db
+      MYSQL_USER: jens
+      MYSQL_PASSWORD: ${DB_PASSWORD:-x}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-x}
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysqldata:/var/lib/mysql
+
+  app:
+    build: ../kino_backend
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: jdbc:mysql://db:3306/kino_db
+      DATABASE_USERNAME: jens
+      DATABASE_PASSWORD: ${DB_PASSWORD:-x}
+    depends_on:
+      - db
+
+  frontend:
+    build: .
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
+
+volumes:
+  mysqldata:

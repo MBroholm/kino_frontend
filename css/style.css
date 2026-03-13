@@ -249,3 +249,43 @@ button:disabled,
     color: #aaa;
     margin-bottom: 16px;
 }
+
+.showing-date {
+    margin-top: 20px;
+}
+
+.showing-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.showing-item {
+    background: #1f1f1f;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px 16px;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-align: center;
+}
+
+.showing-item:hover {
+    background: #2a2a2a;
+    transform: translateY(-2px);
+}
+
+.showing-time {
+    font-weight: bold;
+    color: #fff;
+}
+
+.showing-theatre {
+    color: #aaa;
+    font-size: 0.85rem;
+}

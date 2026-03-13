@@ -93,7 +93,7 @@ async function loadShowings() {
 
             dateBlock.appendChild(dateTitle);
 
-            // 2. Group by date
+            // 2. Group by theatre
             const byTheatre = groupBy(dateShowings, showing => showing.theatreNumber);
 
             Object.keys(byTheatre)
