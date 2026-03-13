@@ -220,20 +220,21 @@ button:disabled,
     border-radius: 3px;
 }
 
+/* --------------------------------------------------
+   Movie-cards
+-------------------------------------------------- */
+
 .movie-card {
-    background: #111;
+    background: #1f1f1f;
+    border: 1px solid #333;
     border-radius: 8px;
     padding: 16px;
-    margin-bottom: 16px;
+    transition: background 0.2s, transform 0.15s;
 }
 
-.movie-card a {
-    color: #fff;
-    text-decoration: none;
-}
-
-.movie-card a:hover {
-    color: #3aaa3a;
+.movie-card:hover {
+    background: #2a2a2a;
+    transform: translateY(-2px);
 }
 
 #moviesContainer {
