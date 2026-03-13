@@ -1,11 +1,14 @@
-const params = new URLSearchParams(window.location.search);
-const showingId = params.get("id");
-
-console.log("showingId:", showingId);
-
 import {getShowingById, updateShowing, deleteShowing} from "../services/showingsService.js";
 import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
+import {redirectIfNotLoggedIn} from "../auth.js";
+
+redirectIfNotLoggedIn();
+
+const params = new URLSearchParams(window.location.search);
+const showingId = params.get("id");
+
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     const showing = await getShowingById(showingId);

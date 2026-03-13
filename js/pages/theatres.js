@@ -1,4 +1,7 @@
 import {getTheatres, createTheatre,deleteTheatre } from "../services/theatresService.js";
+import {redirectIfNotLoggedIn} from "../auth.js";
+
+redirectIfNotLoggedIn();
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadTheatres();

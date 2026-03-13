@@ -1,6 +1,9 @@
 import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
 import {getShowings, createShowing, deleteShowing} from "../services/showingsService.js";
+import {redirectIfNotLoggedIn} from "../auth.js";
+
+redirectIfNotLoggedIn();
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMovies();
