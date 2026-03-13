@@ -219,3 +219,25 @@ button:disabled,
     height: 16px;
     border-radius: 3px;
 }
+
+.movie-card {
+    background: #111;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.movie-card a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.movie-card a:hover {
+    color: #3aaa3a;
+}
+
+#moviesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+}
