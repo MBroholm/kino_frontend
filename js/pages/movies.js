@@ -45,6 +45,7 @@ async function handleSubmit(event){
         const message = document.getElementById("message");
         message.textContent = "Movie created!";
         message.style.color = "green";
+        await loadMovies();
     } catch (err) {
         const message = document.getElementById("message");
         message.textContent = "Error: " + err.message;
