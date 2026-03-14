@@ -1,13 +1,13 @@
 import {fetchJson} from "../api";
 
 export function getCategories() {
-    return fetchJson("/api/categories");
+    return fetchJson("/api/metadata/categories");
 }
 
 export function getEmployeeRoles() {
-    return fetchJson("/api/employee-roles");
+    return fetchJson("/api/metadata/employee-roles");
 }
 
 export function getReservationStatuses() {
-    return fetchJson("/api/reservation-statuses")
+    return fetchJson("/api/metadata/reservation-statuses")
 }
