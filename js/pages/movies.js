@@ -55,7 +55,7 @@ async function handleSubmit(event){
 
 async function loadMovies() {
     const movies = await getMovies();
-    const container = document.getElementById("moviesContainer");
+    const container = document.getElementById("moviesTableContainer");
     container.innerHTML = ""; // clear previous
 
     if (movies.length === 0) {
