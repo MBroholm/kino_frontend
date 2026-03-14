@@ -1,11 +1,12 @@
 import {redirectIfNotLoggedIn} from "../auth.js";
 import {getCategories} from "../services/metadataService.js";
-import {createMovie} from "../services/moviesService.js";
+import {getMovies, createMovie} from "../services/moviesService.js";
 
 redirectIfNotLoggedIn()
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadCategories();
+    await loadMovies();
     document.getElementById("movieForm").addEventListener("submit", handleSubmit);
 });
 
@@ -49,4 +50,43 @@ async function handleSubmit(event){
         message.textContent = "Error: " + err.message;
         message.style.color = "red";
     }
+}
+
+async function loadMovies() {
+    const movies = await getMovies();
+    const container = document.getElementById("moviesContainer");
+    container.innerHTML = ""; // clear previous
+
+    if (movies.length === 0) {
+        container.textContent = "No movies found.";
+        return;
+    }
+
+    const table = document.createElement("table");
+
+    const thead = document.createElement("thead");
+    const headerRow = thead.insertRow();
+
+    ["Title", "Age Limit", "Duration", "Categories", "Description"].forEach(h => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        headerRow.appendChild(th);
+    });
+
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    movies.forEach(movie => {
+        const row = tbody.insertRow();
+
+        row.insertCell().textContent = movie.title;
+        row.insertCell().textContent = movie.ageLimit;
+        row.insertCell().textContent = movie.duration + " min";
+        row.insertCell().textContent = movie.categories.join(", ");
+        row.insertCell().textContent = movie.description;
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
 }
