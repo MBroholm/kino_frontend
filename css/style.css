@@ -46,13 +46,21 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
     padding: 10px;
     background: #2a2a2a;
     color: #fff;
     border: 1px solid #444;
     border-radius: 6px;
     font-size: 1rem;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #2d8a2d;
+    cursor: pointer;
 }
 
 button,
@@ -75,6 +83,20 @@ button:disabled,
 #confirmBtn:disabled {
     background: #444;
     cursor: not-allowed;
+}
+
+#categoriesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px 16px;
+    margin-bottom: 12px;
+}
+
+#categoriesContainer label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 }
 
 /* --------------------------------------------------

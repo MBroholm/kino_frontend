@@ -10,15 +10,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loadCategories() {
-    const categories = await getCategories()
-    const select = document.getElementById("categoriesSelect")
+    const categories = await getCategories();
+    const container = document.getElementById("categoriesContainer");
 
     categories.forEach(category => {
-        const opt = document.createElement("option")
-        opt.value = category;
-        opt.textContent = category;
-        select.appendChild(opt);
-    })
+        const label = document.createElement("label");
+        label.style.display = "block";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = category;
+
+        label.appendChild(checkbox);
+        label.append(" " + category);
+
+        container.appendChild(label);
+    });
 }
 
 async function handleSubmit(event){
@@ -28,8 +35,8 @@ async function handleSubmit(event){
     const ageLimit = parseInt(document.getElementById("ageLimit").value, 10);
     const duration = parseInt(document.getElementById("duration").value, 10);
     const categories = Array.from(
-        document.getElementById("categoriesSelect").selectedOptions
-    ).map(opt => opt.value);
+        document.querySelectorAll("#categoriesContainer input:checked")
+    ).map(cb => cb.value);
     const description = document.getElementById("description").value;
 
     try {

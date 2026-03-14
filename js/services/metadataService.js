@@ -1,4 +1,4 @@
-import {fetchJson} from "../api";
+import {fetchJson} from "../api.js";
 
 export function getCategories() {
     return fetchJson("/api/metadata/categories");
