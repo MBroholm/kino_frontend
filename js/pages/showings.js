@@ -1,6 +1,10 @@
 import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
 import {getShowings, createShowing, deleteShowing} from "../services/showingsService.js";
+import {redirectIfNotLoggedIn} from "../auth.js";
+import {getSeatsForShowing} from "../services/seatsService.js";
+
+redirectIfNotLoggedIn();
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMovies();
@@ -80,35 +84,31 @@ async function loadShowings() {
     // 1. Group by date
     const byDate = groupBy(showings, showing => extractDate(showing.startTime));
 
-    Object.keys(byDate)
-        .sort()
-        .forEach(date => {
-            const dateShowings = byDate[date];
+    for (const date of Object.keys(byDate).sort()) {
+        const dateShowings = byDate[date];
 
-            const dateBlock = document.createElement("div");
-            dateBlock.classList.add("date-block");
+        const dateBlock = document.createElement("div");
+        dateBlock.classList.add("date-block");
 
-            const dateTitle = document.createElement("h3");
-            dateTitle.textContent = formatDate(date);
+        const dateTitle = document.createElement("h3");
+        dateTitle.textContent = formatDate(date);
+        dateBlock.appendChild(dateTitle);
 
-            dateBlock.appendChild(dateTitle);
+        // 2. Group by theatre
+        const byTheatre = groupBy(dateShowings, showing => showing.theatreNumber);
 
-            // 2. Group by date
-            const byTheatre = groupBy(dateShowings, showing => showing.theatreNumber);
+        for (const theatreNumber of Object.keys(byTheatre).sort((a, b) => a - b)) {
+            const theatreShowings = byTheatre[theatreNumber];
+            const theatreTable = await buildTheatreTable(theatreNumber, theatreShowings);
+            dateBlock.appendChild(theatreTable);
+        }
 
-            Object.keys(byTheatre)
-                .sort((a, b) => a - b)
-                .forEach(theatreNumber => {
-                    const theatreShowings = byTheatre[theatreNumber];
-                    const theatreTable = buildTheatreTable(theatreNumber, theatreShowings);
-                    dateBlock.appendChild(theatreTable)
-                })
+        container.appendChild(dateBlock);
+    }
 
-            container.appendChild(dateBlock);
-        })
 }
 
-function buildTheatreTable(theatreNumber, showings) {
+async function buildTheatreTable(theatreNumber, showings) {
     const wrapper = document.createElement("div");
     wrapper.classList.add("theatre-block");
 
@@ -128,7 +128,7 @@ function buildTheatreTable(theatreNumber, showings) {
 
     const headerRow = thead.insertRow()
 
-    const headers = ["Movie", "Start Time", "End Time", "Price", "Action"];
+    const headers = ["Movie", "Start Time", "End Time", "Price", "Reserved Seats", "Action"];
     headers.forEach(header => {
         const th = document.createElement("th");
         th.textContent = header;
@@ -139,7 +139,7 @@ function buildTheatreTable(theatreNumber, showings) {
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
-    showings.forEach(showing => {
+    for (const showing of showings.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))) {
         const row = tbody.insertRow();
 
         const movieCell = document.createElement("td");
@@ -152,11 +152,18 @@ function buildTheatreTable(theatreNumber, showings) {
 
         const endTimeCell = document.createElement("td");
         endTimeCell.textContent = formatTime(showing.endTime);
-        row.appendChild(endTimeCell)
+        row.appendChild(endTimeCell);
 
         const priceCell = document.createElement("td");
         priceCell.textContent = `${showing.price} kr`;
         row.appendChild(priceCell);
+
+        const reservedSeatsCell = document.createElement("td");
+        const showingSeats = await getSeatsForShowing(showing.showingId);
+        const seatCount = showingSeats.length;
+        const reservedCount = showingSeats.filter(seat => seat.occupied).length;
+        reservedSeatsCell.textContent = `${reservedCount} of ${seatCount}`;
+        row.appendChild(reservedSeatsCell);
 
         const actionCell = document.createElement("td");
         row.appendChild(actionCell);
@@ -165,6 +172,12 @@ function buildTheatreTable(theatreNumber, showings) {
         editLink.textContent = "Edit";
         editLink.href = `edit-showing.html?id=${showing.showingId}`;
         actionCell.appendChild(editLink);
+
+        const bookingLink = document.createElement("a");
+        bookingLink.textContent = "Booking";
+        bookingLink.href = `../booking.html?showingId=${showing.showingId}`;
+        bookingLink.style.marginLeft = "12px";
+        actionCell.appendChild(bookingLink);
 
         const deleteLink = document.createElement("a");
         deleteLink.textContent = "Delete";
@@ -175,7 +188,7 @@ function buildTheatreTable(theatreNumber, showings) {
             handleDelete(showing.showingId);
         });
         actionCell.appendChild(deleteLink);
-    });
+    }
 
     return wrapper;
 }

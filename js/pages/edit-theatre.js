@@ -1,9 +1,12 @@
+import {getTheatreById, updateTheatre, } from "../services/theatresService.js";
+import {redirectIfNotLoggedIn} from "../auth.js";
+
+redirectIfNotLoggedIn();
+
 const params = new URLSearchParams(window.location.search);
 const theatreId = params.get("id");
 
 console.log("theatreId:", theatreId);
-
-import {getTheatreById, updateTheatre, } from "../services/theatresService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const theatre = await getTheatreById(theatreId);
