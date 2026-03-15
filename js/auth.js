@@ -9,6 +9,13 @@ function decodeJwt(token) {
     }
 }
 
+export function getCurrentUsername() {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    const decoded = decodeJwt(token);
+    return decoded?.sub;
+}
+
 function isTokenExpired(token) {
     const decoded = decodeJwt(token);
     if (!decoded || !decoded.exp) return true;
