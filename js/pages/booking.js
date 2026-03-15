@@ -1,6 +1,8 @@
 import {getSeatsForShowing} from "../services/seatsService.js";
 import {renderSeatMap} from "../seatmap.js";
 
+import {createReservation} from "../services/reservationService.js";
+
 // URLSearchParams(window.location.search) is a built-in script
 // window.location accesses the current URL of the page, and .search
 // gets the query string part of the URL (the part after the ?).
@@ -37,6 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Could not load seats: " + err.message;
     }
 
+    // confirmBtn is the button in the HTML that opens the confirmation panel when clicked.
     document.getElementById("confirmBtn").addEventListener("click", () => {
         document.getElementById("overlay").style.display = "flex";
         document.getElementById("confirmationPanel").style.display = "block";
@@ -54,12 +57,54 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("confirmationDetails").innerHTML =
             ` <ul>${seatList}</ul> `;
     });
-
+    // cancelBtn is the button in the HTML that closes the confirmation panel when clicked.
     document.getElementById("cancelBtn").addEventListener("click", () => {
         document.getElementById("overlay").style.display = "none";
         document.getElementById("confirmationPanel").style.display = "none";
     });
 
+    // When the finalize button is clicked, attempt to create a reservation
+    document.getElementById("finalizeBtn").addEventListener("click", async () => {
+        // async because we need to await the backend response
+        try {
+            // Build the request object matching CreateReservationRequest in backend
+            // showingId comes from the URL parameter, seatIds converted from Set to Array
+            // since JSON doesn't support Sets, only Arrays
+            const data = {
+                showingId: showingId,
+                seatIds: Array.from(selectedIds)
+            };
+
+            // Send POST request to backend, await the ReservationDTO response
+            // postJson serializes data to JSON, backend deserializes it back to Java object
+            const reservation = await createReservation(data);
+
+            // On success, replace panel content with booking confirmation
+            // using template literals to inject reservation fields from the returned DTO
+            // map each seat in the returned DTO to an HTML list item
+            // reload the page to reset seat map to updated occupied state
+            document.getElementById("confirmationPanel").innerHTML = `
+            <h2>Booking Confirmed!</h2>
+            <p>Your reference number is:</p>
+            <h3>${reservation.referenceNumber}</h3>
+            <p>Movie: ${reservation.movieTitle}</p>
+            <p>Start: ${reservation.startTime}</p>
+            <p>Theatre: ${reservation.theatreNumber}</p>
+            <ul>
+                ${reservation.seats.map(seat => `<li>Row ${seat.rowNumber}, Seat ${seat.seatNumber}</li>`).join("")}
+            </ul>
+            <button onclick="window.location.reload()">Back to seat map</button>
+        `;
+        } catch (err) {
+            // On error (eg. seats already taken), replace panel with error message
+            // err.message contains the error text returned by the backend
+            document.getElementById("confirmationPanel").innerHTML = `
+            <h2>Booking Failed</h2>
+            <p>${err.message}</p>
+            <button id="cancelBtn">Go back</button>
+        `;
+        }
+    });
 });
 
 function toggleSeat(seatId) {
