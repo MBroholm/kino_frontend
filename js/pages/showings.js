@@ -139,7 +139,7 @@ async function buildTheatreTable(theatreNumber, showings) {
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
-    for (const showing of showings) {
+    for (const showing of showings.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))) {
         const row = tbody.insertRow();
 
         const movieCell = document.createElement("td");
