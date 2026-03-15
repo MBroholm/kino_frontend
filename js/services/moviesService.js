@@ -1,4 +1,4 @@
-import {fetchJson, postJsonAdmin} from "../api.js";
+import {fetchJson, postJsonAdmin, putJsonAdmin, requestDeleteAdmin} from "../api.js";
 
 export function getMovies() {
     return fetchJson("/api/movies");
@@ -14,4 +14,12 @@ export function getShowingForMovie(id) {
 
 export function createMovie(data) {
     return postJsonAdmin("/api/admin/movies", data);
+}
+
+export function deleteMovie(id) {
+    return requestDeleteAdmin(`/api/admin/movies/${id}`);
+}
+
+export function updateMovie(id, data) {
+    return putJsonAdmin(`/api/admin/movies/${id}`, data);
 }

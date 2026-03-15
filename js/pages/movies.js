@@ -1,6 +1,6 @@
 import {redirectIfNotLoggedIn} from "../auth.js";
 import {getCategories} from "../services/metadataService.js";
-import {getMovies, createMovie} from "../services/moviesService.js";
+import {getMovies, createMovie, deleteMovie} from "../services/moviesService.js";
 
 redirectIfNotLoggedIn()
 
@@ -68,7 +68,7 @@ async function loadMovies() {
     const thead = document.createElement("thead");
     const headerRow = thead.insertRow();
 
-    ["Title", "Age Limit", "Duration", "Categories", "Description"].forEach(h => {
+    ["Title", "Age Limit", "Duration", "Categories", "Description", "Action"].forEach(h => {
         const th = document.createElement("th");
         th.textContent = h;
         headerRow.appendChild(th);
@@ -86,8 +86,41 @@ async function loadMovies() {
         row.insertCell().textContent = movie.duration + " min";
         row.insertCell().textContent = movie.categories.join(", ");
         row.insertCell().textContent = movie.description;
+
+        const actionCell = document.createElement("td");
+        row.appendChild(actionCell);
+
+        const editLink = document.createElement("a");
+        editLink.textContent = "Edit";
+        editLink.href = `edit-movie.html?id=${movie.movieId}`;
+        actionCell.appendChild(editLink);
+
+        const deleteLink = document.createElement("a");
+        deleteLink.textContent = "Delete";
+        deleteLink.href = "#";
+        deleteLink.style.marginLeft = "12px";
+        deleteLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            handleDelete(movie.movieId);
+        });
+        actionCell.appendChild(deleteLink);
     });
 
     table.appendChild(tbody);
     container.appendChild(table);
+}
+
+async function handleDelete(movieId) {
+    const confirmed = confirm("Are you sure you want to delete this movie?");
+
+    if (!confirmed) {
+        return; // user cancelled
+    }
+
+    try {
+        await deleteMovie(movieId);
+        window.location.href = "movies.html";
+    } catch (err) {
+        document.getElementById("message").textContent = "Error: " + err.message;
+    }
 }
