@@ -1,6 +1,6 @@
 import {redirectIfNotLoggedIn} from "../auth.js";
 import {getCategories} from "../services/metadataService.js";
-import {getMovies, createMovie, deleteMovie} from "../services/moviesService.js";
+import {getMovies, createMovie, deleteMovie, getShowingsForMovie} from "../services/moviesService.js";
 
 redirectIfNotLoggedIn()
 
@@ -111,6 +111,12 @@ async function loadMovies() {
 }
 
 async function handleDelete(movieId) {
+    const showings = await getShowingsForMovie(movieId);
+    if (showings.length > 0) {
+        alert("Can't delete movie, because it is included in an existing showing");
+        return;
+    }
+
     const confirmed = confirm("Are you sure you want to delete this movie?");
 
     if (!confirmed) {
