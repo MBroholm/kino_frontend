@@ -8,7 +8,7 @@ export function getMovieById(id) {
     return fetchJson(`/api/movies/${id}`);
 }
 
-export function getShowingForMovie(id) {
+export function getShowingsForMovie(id) {
     return fetchJson(`/api/movies/${id}/showings`);
 }
 

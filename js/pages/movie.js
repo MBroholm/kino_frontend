@@ -2,7 +2,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const movieId = urlParams.get("id");
 
-import {getMovieById, getShowingForMovie} from "../services/moviesService.js";
+import {getMovieById, getShowingsForMovie} from "../services/moviesService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMovie();
@@ -37,7 +37,7 @@ async function loadShowings() {
     const container = document.getElementById("showing-container");
     container.innerHTML = "";
 
-    const showings = await getShowingForMovie(movieId);
+    const showings = await getShowingsForMovie(movieId);
 
     if (!showings || showings.length === 0) {
         container.textContent = "No showings available";
