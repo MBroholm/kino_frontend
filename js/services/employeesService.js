@@ -6,6 +6,6 @@ export function getEmployee(id) { return fetchJsonAdmin(`/api/admin/employees/${
 
 export function createEmployee(employee) { return postJsonAdmin("/api/admin/employees", employee); }
 
-export function updateEmployee(employee) { return putJsonAdmin(`/api/admin/employees/${employee.id}`, employee); }
+export function updateEmployee(id, data) { return putJsonAdmin(`/api/admin/employees/${id}`, data); }
 
 export function deleteEmployee(id) { return requestDeleteAdmin(`/api/admin/employees/${id}`); }

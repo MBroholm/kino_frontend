@@ -23,8 +23,15 @@ async function loadEmployees() {
             deleteBtn.textContent = "Delete";
             deleteBtn.addEventListener("click", () => handleDelete(employee.employeeId));
             employeeDiv.appendChild(deleteBtn);
-    }
-        container.appendChild(employeeDiv)})
+        }
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", () => handleEdit(employee.employeeId));
+        employeeDiv.appendChild(editBtn);
+
+        container.appendChild(employeeDiv);
+    })
 }
 
 async function handleDelete(employeeId) {
