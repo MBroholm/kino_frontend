@@ -1,4 +1,4 @@
-import {saveEmployee, deleteEmployee, getEmployees} from '../services/employeesService.js';
+import {createEmployee, deleteEmployee, getEmployees} from '../services/employeesService.js';
 import {redirectIfNotLoggedIn} from "../auth.js";
 
 redirectIfNotLoggedIn();
@@ -53,7 +53,7 @@ async function handleSubmit(event) {
     if (password !== confirmPassword) { return alert("Passwords do not match"); }
 
     try {
-        await saveEmployee({ username, password, roles: [role] });
+        await createEmployee({ username, password, roles: [role] });
         window.location.href = "employees.html";
     } catch (err) {
         document.getElementById("message").textContent = "Error: " + err.message;
