@@ -101,6 +101,29 @@ button:disabled,
     flex: 1;
 }
 
+#confirmationPanel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 350px;
+    background: #111;
+    border-radius: 8px;
+    box-shadow: 0 0 20px #333;
+    padding: 24px;
+    display: none;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(17, 16, 16, 0.7);
+    display: none;
+}
+
 /* --------------------------------------------------
    THEATRE BLOCKS
 -------------------------------------------------- */
