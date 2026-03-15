@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // showingId comes from the URL parameter, seatIds converted from Set to Array
             // since JSON doesn't support Sets, only Arrays
             const data = {
-                showingId: showingId,
+                showingId: parseInt(showingId),
                 seatIds: Array.from(selectedIds)
             };
 
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("confirmationPanel").innerHTML = `
             <h2>Booking Failed</h2>
             <p>${err.message}</p>
-            <button id="cancelBtn">Go back</button>
+            <button onclick="window.location.reload()">Go back</button>
         `;
         }
     });
