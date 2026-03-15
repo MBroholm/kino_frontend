@@ -36,6 +36,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("seatMapContainer").textContent =
             "Could not load seats: " + err.message;
     }
+
+    document.getElementById("confirmBtn").addEventListener("click", () => {
+        document.getElementById("overlay").style.display = "flex";
+        document.getElementById("confirmationPanel").style.display = "block";
+
+        const selectedSeats = allSeats.filter(seat => selectedIds.has(seat.seatId));
+
+        // Build the HTML content for the confirmation panel
+        // transforms the array of selected seats into a list of HTML list items,
+        // and then joins them into a single string
+        const seatList = selectedSeats
+            .map(seat => `<li>Row ${seat.rowNumber}, Seat ${seat.seatNumber}</li>`)
+            .join("");
+
+        // Populate the confirmation details paragraph
+        document.getElementById("confirmationDetails").innerHTML =
+            ` <ul>${seatList}</ul> `;
+    });
+
+    document.getElementById("cancelBtn").addEventListener("click", () => {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("confirmationPanel").style.display = "none";
+    });
+
 });
 
 function toggleSeat(seatId) {
