@@ -9,7 +9,6 @@ const params = new URLSearchParams(window.location.search);
 const showingId = params.get("id");
 
 
-
 document.addEventListener("DOMContentLoaded", async () => {
     const showing = await getShowingById(showingId);
 
@@ -61,7 +60,9 @@ async function handleSubmit(event) {
         await updateShowing(showingId, {movieId, theatreId, startTime, price});
         window.location.href = "showings.html";
     } catch (err) {
-        document.getElementById("message").textContent = "Error: " + err.message;
+        const message = document.getElementById("message");
+        message.textContent = "Error: " + err.message;
+        message.style.color = "red";
     }
 }
 
@@ -76,7 +77,9 @@ async function handleDelete() {
         await deleteShowing(showingId);
         window.location.href = "showings.html";
     } catch (err) {
-        document.getElementById("message").textContent = "Error: " + err.message;
+        const message = document.getElementById("message");
+        message.textContent = "Error: " + err.message;
+        message.style.color = "red";
     }
 }
 
