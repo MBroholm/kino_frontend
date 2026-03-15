@@ -1,5 +1,5 @@
 import {createEmployee, deleteEmployee, getEmployees} from '../services/employeesService.js';
-import {redirectIfNotLoggedIn} from "../auth.js";
+import {redirectIfNotLoggedIn, getCurrentUsername} from "../auth.js";
 
 redirectIfNotLoggedIn();
 
@@ -18,12 +18,13 @@ async function loadEmployees() {
         employeeDiv.innerHTML = `
         <h3> Employee ${employee.username}</h3>
 `
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "Delete";
-        deleteBtn.addEventListener("click", () => handleDelete(employee.employeeId));
-        employeeDiv.appendChild(deleteBtn);
-        container.appendChild(employeeDiv)
-    })
+        if (getCurrentUsername() !== employee.username) {
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Delete";
+            deleteBtn.addEventListener("click", () => handleDelete(employee.employeeId));
+            employeeDiv.appendChild(deleteBtn);
+    }
+        container.appendChild(employeeDiv)})
 }
 
 async function handleDelete(employeeId) {
