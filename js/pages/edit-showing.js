@@ -1,31 +1,44 @@
 import {getShowingById, updateShowing, deleteShowing} from "../services/showingsService.js";
 import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
-import {redirectIfNotLoggedIn} from "../auth.js";
 
-redirectIfNotLoggedIn();
-
-const params = new URLSearchParams(window.location.search);
-const showingId = params.get("id");
-
-
-document.addEventListener("DOMContentLoaded", async () => {
+async function render(container, params) {
+    const showingId = params.get("id");
     const showing = await getShowingById(showingId);
+
+    if (!showing) {
+        container.innerHTML = "<h2>Showing not found</h2>";
+        return;
+    }
+
+    container.innerHTML = `
+        <a href="#/admin/showings">← Back to Showings</a>
+        <h2>Edit Showing</h2>
+        <form id="editShowingForm">
+            <label for="movieSelect">Movie:</label>
+            <select id="movieSelect"></select>
+            <label for="theatreSelect">Theatre:</label>
+            <select id="theatreSelect"></select>
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime" value="${showing.startTime.slice(0, 16)}">
+            <label for="price">Price:</label>
+            <input type="number" id="price" value="${showing.price}" min="0" step="0.01" required>
+            <button type="submit">Save Changes</button>
+        </form>
+        <button id="btnDelete">Delete Showing</button>
+        <div id="message"></div>
+    `;
 
     await loadMovies(showing.movieId);
     await loadTheatres(showing.theatreId);
 
-    document.getElementById("startTime").value = showing.startTime.slice(0, 16);
-    document.getElementById("price").value = showing.price;
-
-    document.getElementById("editShowingForm").addEventListener("submit", handleSubmit);
-    document.getElementById("btnDelete").addEventListener("click", handleDelete);
-});
+    document.getElementById("editShowingForm").addEventListener("submit", (e) => handleSubmit(e, showingId));
+    document.getElementById("btnDelete").addEventListener("click", () => handleDelete(showingId));
+}
 
 async function loadMovies(selectedId) {
     const movies = await getMovies();
     const select = document.getElementById("movieSelect");
-
     movies.forEach(movie => {
         const opt = document.createElement("option");
         opt.value = movie.movieId;
@@ -38,19 +51,17 @@ async function loadMovies(selectedId) {
 async function loadTheatres(selectedId) {
     const theatres = await getTheatres();
     const select = document.getElementById("theatreSelect");
-
     theatres.forEach(theatre => {
         const opt = document.createElement("option");
         opt.value = theatre.theatreId;
         opt.textContent = `Theatre ${theatre.theatreNumber}`;
         if (theatre.theatreId === selectedId) opt.selected = true;
         select.appendChild(opt);
-    })
+    });
 }
 
-async function handleSubmit(event) {
+async function handleSubmit(event, showingId) {
     event.preventDefault();
-
     const movieId = document.getElementById("movieSelect").value;
     const theatreId = document.getElementById("theatreSelect").value;
     const startTime = document.getElementById("startTime").value;
@@ -58,7 +69,7 @@ async function handleSubmit(event) {
 
     try {
         await updateShowing(showingId, {movieId, theatreId, startTime, price});
-        window.location.href = "showings.html";
+        window.location.hash = "#/admin/showings";
     } catch (err) {
         const message = document.getElementById("message");
         message.textContent = "Error: " + err.message;
@@ -66,20 +77,17 @@ async function handleSubmit(event) {
     }
 }
 
-async function handleDelete() {
-    const confirmed = confirm("Are you sure you want to delete this showing?");
-
-    if (!confirmed) {
-        return; // user cancelled
-    }
-
-    try {
-        await deleteShowing(showingId);
-        window.location.href = "showings.html";
-    } catch (err) {
-        const message = document.getElementById("message");
-        message.textContent = "Error: " + err.message;
-        message.style.color = "red";
+async function handleDelete(showingId) {
+    if (confirm("Are you sure you want to delete this showing?")) {
+        try {
+            await deleteShowing(showingId);
+            window.location.hash = "#/admin/showings";
+        } catch (err) {
+            const message = document.getElementById("message");
+            message.textContent = "Error: " + err.message;
+            message.style.color = "red";
+        }
     }
 }
 
+export default { render };

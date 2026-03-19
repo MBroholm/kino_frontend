@@ -1,25 +1,38 @@
 import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
 import {getShowings, createShowing, deleteShowing} from "../services/showingsService.js";
-import {redirectIfNotLoggedIn} from "../auth.js";
 import {getSeatsForShowing} from "../services/seatsService.js";
 
-redirectIfNotLoggedIn();
+async function render(container, params) {
+    container.innerHTML = `
+        <a href="#/admin/dashboard">← Back to Dashboard</a>
+        <h2>Schedule a New Showing</h2>
+        <form id="showingForm">
+            <label for="movieSelect">Movie:</label>
+            <select id="movieSelect"></select>
+            <label for="theatreSelect">Theatre:</label>
+            <select id="theatreSelect"></select>
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime">
+            <label for="price">Price:</label>
+            <input type="number" id="price" min="0" step="0.01" required>
+            <button type="submit">Create Showing</button>
+        </form>
+        <div id="message"></div>
+        <h2>Scheduled Showings</h2>
+        <div id="showingsContainer"></div>
+    `;
 
-document.addEventListener("DOMContentLoaded", async () => {
     await loadMovies();
     await loadTheatres();
     setupStartTimeLimits();
-
     document.getElementById("showingForm").addEventListener("submit", handleSubmit);
-
     await loadShowings();
-});
+}
 
 async function loadMovies() {
     const movies = await getMovies();
     const select = document.getElementById("movieSelect");
-
     movies.forEach(movie => {
         const option = document.createElement("option");
         option.value = movie.movieId;
@@ -31,7 +44,6 @@ async function loadMovies() {
 async function loadTheatres() {
     const theatres = await getTheatres();
     const select = document.getElementById("theatreSelect");
-
     theatres.forEach(theatre => {
         const option = document.createElement("option");
         option.value = theatre.theatreId;
@@ -42,21 +54,16 @@ async function loadTheatres() {
 
 function setupStartTimeLimits() {
     const input = document.getElementById("startTime");
-
     const now = new Date();
     const threeMonthsAhead = new Date();
     threeMonthsAhead.setMonth(threeMonthsAhead.getMonth() + 3);
-
-    const toLocalInputValue = (date) =>
-        date.toISOString().slice(0, 16);
-
+    const toLocalInputValue = (date) => date.toISOString().slice(0, 16);
     input.min = toLocalInputValue(now);
     input.max = toLocalInputValue(threeMonthsAhead);
 }
 
 async function handleSubmit(event) {
     event.preventDefault();
-
     const movieId = document.getElementById("movieSelect").value;
     const theatreId = document.getElementById("theatreSelect").value;
     const startTime = document.getElementById("startTime").value;
@@ -77,105 +84,69 @@ async function handleSubmit(event) {
 
 async function loadShowings() {
     const showings = await getShowings();
-
     const container = document.getElementById("showingsContainer");
     container.innerHTML = "";
-
-    // 1. Group by date
     const byDate = groupBy(showings, showing => extractDate(showing.startTime));
 
     for (const date of Object.keys(byDate).sort()) {
-        const dateShowings = byDate[date];
-
         const dateBlock = document.createElement("div");
         dateBlock.classList.add("date-block");
-
         const dateTitle = document.createElement("h3");
         dateTitle.textContent = formatDate(date);
         dateBlock.appendChild(dateTitle);
 
-        // 2. Group by theatre
-        const byTheatre = groupBy(dateShowings, showing => showing.theatreNumber);
-
+        const byTheatre = groupBy(byDate[date], showing => showing.theatreNumber);
         for (const theatreNumber of Object.keys(byTheatre).sort((a, b) => a - b)) {
-            const theatreShowings = byTheatre[theatreNumber];
-            const theatreTable = await buildTheatreTable(theatreNumber, theatreShowings);
+            const theatreTable = await buildTheatreTable(theatreNumber, byTheatre[theatreNumber]);
             dateBlock.appendChild(theatreTable);
         }
-
         container.appendChild(dateBlock);
     }
-
 }
 
 async function buildTheatreTable(theatreNumber, showings) {
     const wrapper = document.createElement("div");
     wrapper.classList.add("theatre-block");
-
-    //title
     const theatreTitle = document.createElement("h4");
     theatreTitle.textContent = `Theatre ${theatreNumber}`;
     wrapper.appendChild(theatreTitle);
 
-    //table
     const table = document.createElement("table");
     table.classList.add("showings-table");
     wrapper.appendChild(table);
 
-    //THEAD
     const thead = document.createElement("thead");
-    table.appendChild(thead);
-
-    const headerRow = thead.insertRow()
-
-    const headers = ["Movie", "Start Time", "End Time", "Price", "Reserved Seats", "Action"];
-    headers.forEach(header => {
+    const headerRow = thead.insertRow();
+    ["Movie", "Start Time", "End Time", "Price", "Reserved Seats", "Action"].forEach(h => {
         const th = document.createElement("th");
-        th.textContent = header;
+        th.textContent = h;
         headerRow.appendChild(th);
     });
+    table.appendChild(thead);
 
-    //TBODY
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
     for (const showing of showings.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))) {
         const row = tbody.insertRow();
+        row.insertCell().textContent = showing.movieTitle;
+        row.insertCell().textContent = formatTime(showing.startTime);
+        row.insertCell().textContent = formatTime(showing.endTime);
+        row.insertCell().textContent = `${showing.price} kr`;
 
-        const movieCell = document.createElement("td");
-        movieCell.textContent = showing.movieTitle;
-        row.appendChild(movieCell);
-
-        const startTimeCell = document.createElement("td");
-        startTimeCell.textContent = formatTime(showing.startTime);
-        row.appendChild(startTimeCell);
-
-        const endTimeCell = document.createElement("td");
-        endTimeCell.textContent = formatTime(showing.endTime);
-        row.appendChild(endTimeCell);
-
-        const priceCell = document.createElement("td");
-        priceCell.textContent = `${showing.price} kr`;
-        row.appendChild(priceCell);
-
-        const reservedSeatsCell = document.createElement("td");
+        const reservedSeatsCell = row.insertCell();
         const showingSeats = await getSeatsForShowing(showing.showingId);
-        const seatCount = showingSeats.length;
-        const reservedCount = showingSeats.filter(seat => seat.occupied).length;
-        reservedSeatsCell.textContent = `${reservedCount} of ${seatCount}`;
-        row.appendChild(reservedSeatsCell);
+        reservedSeatsCell.textContent = `${showingSeats.filter(s => s.occupied).length} of ${showingSeats.length}`;
 
-        const actionCell = document.createElement("td");
-        row.appendChild(actionCell);
-
+        const actionCell = row.insertCell();
         const editLink = document.createElement("a");
         editLink.textContent = "Edit";
-        editLink.href = `edit-showing.html?id=${showing.showingId}`;
+        editLink.href = `#/admin/edit-showing?id=${showing.showingId}`;
         actionCell.appendChild(editLink);
 
         const bookingLink = document.createElement("a");
         bookingLink.textContent = "Booking";
-        bookingLink.href = `../booking.html?showingId=${showing.showingId}`;
+        bookingLink.href = `#/booking?showingId=${showing.showingId}`;
         bookingLink.style.marginLeft = "12px";
         actionCell.appendChild(bookingLink);
 
@@ -183,29 +154,20 @@ async function buildTheatreTable(theatreNumber, showings) {
         deleteLink.textContent = "Delete";
         deleteLink.href = "#";
         deleteLink.style.marginLeft = "12px";
-        deleteLink.addEventListener("click", (e) => {
+        deleteLink.addEventListener("click", async (e) => {
             e.preventDefault();
-            handleDelete(showing.showingId);
+            if (confirm("Are you sure you want to delete this showing?")) {
+                try {
+                    await deleteShowing(showing.showingId);
+                    await loadShowings();
+                } catch (err) {
+                    document.getElementById("message").textContent = "Error: " + err.message;
+                }
+            }
         });
         actionCell.appendChild(deleteLink);
     }
-
     return wrapper;
-}
-
-async function handleDelete(showingId) {
-    const confirmed = confirm("Are you sure you want to delete this showing?");
-
-    if (!confirmed) {
-        return; // user cancelled
-    }
-
-    try {
-        await deleteShowing(showingId);
-        window.location.href = "showings.html";
-    } catch (err) {
-        document.getElementById("message").textContent = "Error: " + err.message;
-    }
 }
 
 function groupBy(list, keyGetter) {
@@ -218,23 +180,8 @@ function groupBy(list, keyGetter) {
     return map;
 }
 
-function extractDate(dateTimeString) {
-    return dateTimeString.split("T")[0];
-}
+function extractDate(dateTimeString) { return dateTimeString.split("T")[0]; }
+function formatDate(dateString) { return new Date(dateString).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }); }
+function formatTime(dateTimeString) { return new Date(dateTimeString).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); }
 
-function formatDate(dateString) {
-    const d = new Date(dateString);
-    return d.toLocaleDateString("en-GB", {
-        weekday: "long",
-        day: "numeric",
-        month: "long"
-    });
-}
-
-function formatTime(dateTimeString) {
-    const d = new Date(dateTimeString);
-    return d.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
+export default { render };

@@ -1,17 +1,20 @@
 import {getMovies} from "../services/moviesService.js";
 
-document.addEventListener("DOMContentLoaded", loadMovies);
+async function render(container, params) {
+    container.innerHTML = `
+        <h2>Now Showing</h2>
+        <div id="moviesContainer"></div>
+    `;
 
-async function loadMovies() {
     const movies = await getMovies();
-    const container = document.getElementById("moviesContainer");
-    container.innerHTML = "";
+    const moviesContainer = document.getElementById("moviesContainer");
+    
     movies.forEach(movie => {
         const movieDiv = document.createElement("div");
-        container.appendChild(movieDiv);
+        moviesContainer.appendChild(movieDiv);
         movieDiv.classList.add("movie-card");
         movieDiv.addEventListener("click", () => {
-            window.location.href = `movie.html?id=${movie.movieId}`;
+            window.location.hash = `#/movie?id=${movie.movieId}`;
         });
 
         const title = document.createElement("h3");
@@ -41,9 +44,7 @@ async function loadMovies() {
         });
 
         movieDiv.appendChild(categoriesDiv);
-
-
     });
-
-
 }
+
+export default { render };

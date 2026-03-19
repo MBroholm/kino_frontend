@@ -1,42 +1,51 @@
-// Extract movieId from URL: movie.html?id=3
-const urlParams = new URLSearchParams(window.location.search);
-const movieId = urlParams.get("id");
-
 import {getMovieById, getShowingsForMovie} from "../services/moviesService.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await loadMovie();
-    await loadShowings();
-});
+async function render(container, params) {
+    const movieId = params.get("id");
 
-async function loadMovie() {
+    container.innerHTML = `
+        <a href="#/">← Back to Movies</a>
+        <div id="movie-container">
+            <h1 id="movie-title">Loading...</h1>
+            <div class="meta">
+                <span id="ageLimit"></span> |
+                <span id="duration"></span>
+            </div>
+            <div class="categories" id="categories"></div>
+            <p id="description"></p>
+        </div>
+        <h2>Showings:</h2>
+        <div id="showing-container"></div>
+    `;
+
     if (!movieId) {
-        document.getElementById("title").textContent = "No movie ID provided";
+        document.getElementById("movie-title").textContent = "No movie ID provided";
         return;
     }
 
-    const movie = await getMovieById(movieId);
+    try {
+        const movie = await getMovieById(movieId);
+        document.getElementById("movie-title").textContent = movie.title;
+        document.getElementById("ageLimit").textContent = `Age limit: ${movie.ageLimit}+`;
+        document.getElementById("duration").textContent = `Duration: ${movie.duration} min`;
+        document.getElementById("description").textContent = movie.description;
 
-    document.getElementById("title").textContent = movie.title;
-    document.getElementById("ageLimit").textContent = `Age limit: ${movie.ageLimit}+`;
-    document.getElementById("duration").textContent = `Duration: ${movie.duration} min`;
-    document.getElementById("description").textContent = movie.description;
+        const categoriesDiv = document.getElementById("categories");
+        movie.categories.forEach(cat => {
+            const tag = document.createElement("span");
+            tag.className = "category-tag";
+            tag.textContent = cat;
+            categoriesDiv.appendChild(tag);
+        });
 
-    const categoriesDiv = document.getElementById("categories");
-    categoriesDiv.innerHTML = "";
-
-    movie.categories.forEach(cat => {
-        const tag = document.createElement("span");
-        tag.className = "category-tag";
-        tag.textContent = cat;
-        categoriesDiv.appendChild(tag);
-    });
+        await loadShowings(movieId);
+    } catch (err) {
+        document.getElementById("movie-title").textContent = "Movie not found";
+    }
 }
 
-async function loadShowings() {
+async function loadShowings(movieId) {
     const container = document.getElementById("showing-container");
-    container.innerHTML = "";
-
     const showings = await getShowingsForMovie(movieId);
 
     if (!showings || showings.length === 0) {
@@ -44,7 +53,6 @@ async function loadShowings() {
         return;
     }
 
-    // Group by date
     const grouped = groupBy(showings, showing => extractDate(showing.startTime));
 
     Object.keys(grouped)
@@ -66,7 +74,7 @@ async function loadShowings() {
                     const item = document.createElement("div");
                     item.className = "showing-item";
                     item.addEventListener("click", () => {
-                        window.location.href = `booking.html?showingId=${showing.showingId}`;
+                        window.location.hash = `#/booking?showingId=${showing.showingId}`;
                     });
 
                     const timeElement = document.createElement("span");
@@ -75,11 +83,10 @@ async function loadShowings() {
 
                     const theatreElement = document.createElement("span");
                     theatreElement.className = "showing-theatre";
-                    theatreElement.textContent = `Theatre ${showing.theatreNumber}`
+                    theatreElement.textContent = `Theatre ${showing.theatreNumber}`;
 
                     item.appendChild(timeElement);
-                    item.appendChild(theatreElement)
-
+                    item.appendChild(theatreElement);
                     list.appendChild(item);
                 });
 
@@ -98,23 +105,8 @@ function groupBy(list, keyGetter) {
     return map;
 }
 
-function extractDate(dateTimeString) {
-    return dateTimeString.split("T")[0];
-}
+function extractDate(dateTimeString) { return dateTimeString.split("T")[0]; }
+function formatDate(dateString) { return new Date(dateString).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }); }
+function formatTime(dateTimeString) { return new Date(dateTimeString).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); }
 
-function formatDate(dateString) {
-    const d = new Date(dateString);
-    return d.toLocaleDateString("en-GB", {
-        weekday: "long",
-        day: "numeric",
-        month: "long"
-    });
-}
-
-function formatTime(dateTimeString) {
-    const d = new Date(dateTimeString);
-    return d.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
+export default { render };

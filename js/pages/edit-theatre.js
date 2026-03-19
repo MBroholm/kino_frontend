@@ -1,33 +1,44 @@
-import {getTheatreById, updateTheatre, } from "../services/theatresService.js";
-import {redirectIfNotLoggedIn} from "../auth.js";
+import {getTheatreById, updateTheatre} from "../services/theatresService.js";
 
-redirectIfNotLoggedIn();
-
-const params = new URLSearchParams(window.location.search);
-const theatreId = params.get("id");
-
-console.log("theatreId:", theatreId);
-
-document.addEventListener("DOMContentLoaded", async () => {
+async function render(container, params) {
+    const theatreId = params.get("id");
     const theatre = await getTheatreById(theatreId);
 
-    document.getElementById("theatreNumber").value = theatre.theatreNumber;
-    document.getElementById("numberOfRows").value = theatre.numberOfRows;
-    document.getElementById("seatsPerRow").value = theatre.seatsPerRow;
-    document.getElementById("editTheatreForm").addEventListener("submit", handleSubmit);
-});
+    if (!theatre) {
+        container.innerHTML = "<h2>Theatre not found</h2>";
+        return;
+    }
 
-async function handleSubmit(event) {
+    container.innerHTML = `
+        <a href="#/admin/theatres">← Back to Theatres</a>
+        <h2>Edit Theatre</h2>
+        <form id="editTheatreForm">
+            <label for="theatreNumber">Theatre Number:</label>
+            <input type="number" id="theatreNumber" value="${theatre.theatreNumber}" min="1" required>
+            <label for="numberOfRows">Number of Rows:</label>
+            <input type="number" id="numberOfRows" value="${theatre.numberOfRows}" min="1" required>
+            <label for="seatsPerRow">Seats Per Row:</label>
+            <input type="number" id="seatsPerRow" value="${theatre.seatsPerRow}" min="1" required>
+            <button type="submit">Save Changes</button>
+        </form>
+        <div id="message"></div>
+    `;
+
+    document.getElementById("editTheatreForm").addEventListener("submit", (e) => handleSubmit(e, theatreId));
+}
+
+async function handleSubmit(event, theatreId) {
     event.preventDefault();
-
     const theatreNumber = document.getElementById("theatreNumber").value;
     const numberOfRows = document.getElementById("numberOfRows").value;
     const seatsPerRow = document.getElementById("seatsPerRow").value;
 
     try {
         await updateTheatre(theatreId, {theatreNumber, numberOfRows, seatsPerRow});
-        window.location.href = "theatres.html";
+        window.location.hash = "#/admin/theatres";
     } catch (err) {
         document.getElementById("message").textContent = "Error: " + err.message;
     }
 }
+
+export default { render };
