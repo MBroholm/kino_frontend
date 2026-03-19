@@ -9,8 +9,10 @@ WORKDIR /usr/share/nginx/html
 # Remove default Nginx static files
 RUN rm -rf ./*
 
-# Copy project into the Nginx web root
-COPY . .
+# Copy only the files needed for the website
+COPY index.html ./
+COPY css/ ./css/
+COPY js/ ./js/
 
 # Expose port 80 for the container
 EXPOSE 80
