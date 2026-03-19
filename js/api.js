@@ -44,7 +44,7 @@ async function request(endpoint, options = {}, useAuth = false) {
 
     // Handle 401 Unauthorized for admin requests
     if (!response.ok && response.status === 401 && useAuth) {
-        window.location.href = "login.html";
+        window.location.hash = "#/admin";
     }
 
     // Handle common error responses
