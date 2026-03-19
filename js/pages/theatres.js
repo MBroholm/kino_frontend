@@ -1,4 +1,5 @@
 import {getTheatres, createTheatre, deleteTheatre} from "../services/theatresService.js";
+import {renderTable} from "../components/Table.js";
 
 async function render(container, params) {
     container.innerHTML = `
@@ -15,7 +16,7 @@ async function render(container, params) {
         </form>
         <div id="message"></div>
         <h2>Theatres</h2>
-        <div id="theatresContainer"></div>
+        <div id="theatresTableContainer"></div>
     `;
 
     document.getElementById("theatreForm").addEventListener("submit", (e) => handleSubmit(e, container));
@@ -24,19 +25,18 @@ async function render(container, params) {
 
 async function loadTheatres(container) {
     const theatres = await getTheatres();
-    const theatresContainer = document.getElementById("theatresContainer");
-    theatresContainer.innerHTML = "";
+    const tableContainer = document.getElementById("theatresTableContainer");
+    tableContainer.innerHTML = "";
     
-    theatres.forEach(theatre => {
-        const theatreDiv = document.createElement("div");
-        theatreDiv.classList.add("theatre-card"); // using card class for better look
-        theatreDiv.innerHTML = `
-            <h3>Theatre ${theatre.theatreNumber}</h3>
-            <p>Number of rows: ${theatre.numberOfRows}</p>
-            <p>Seats per row: ${theatre.seatsPerRow}</p>
-        `;
-        
+    if (theatres.length === 0) {
+        tableContainer.textContent = "No theatres found.";
+        return;
+    }
+
+    const headers = ["Theatre #", "Rows", "Seats/Row", "Action"];
+    const rows = theatres.map(theatre => {
         const actions = document.createElement("div");
+        
         const editButton = document.createElement("button");
         editButton.textContent = "Edit";
         editButton.addEventListener("click", () => window.location.hash = `#/admin/edit-theatre?id=${theatre.theatreId}`);
@@ -48,39 +48,43 @@ async function loadTheatres(container) {
         
         actions.appendChild(editButton);
         actions.appendChild(deleteButton);
-        theatreDiv.appendChild(actions);
-        theatresContainer.appendChild(theatreDiv);
+        
+        return [
+            theatre.theatreNumber,
+            theatre.numberOfRows,
+            theatre.seatsPerRow,
+            actions
+        ];
     });
+
+    tableContainer.appendChild(renderTable(headers, rows));
 }
 
 async function handleSubmit(event, container) {
     event.preventDefault();
-    const theatreNumber = document.getElementById("theatreNumber").value;
-    const numberOfRows = document.getElementById("numberOfRows").value;
-    const seatsPerRow = document.getElementById("seatsPerRow").value;
+    const theatreData = {
+        theatreNumber: document.getElementById("theatreNumber").value,
+        numberOfRows: document.getElementById("numberOfRows").value,
+        seatsPerRow: document.getElementById("seatsPerRow").value,
+        cinemaId: 1
+    };
 
     try {
-        await createTheatre({theatreNumber, numberOfRows, seatsPerRow, cinemaId: 1});
-        const message = document.getElementById("message");
-        message.textContent = "Theatre created!";
-        message.style.color = "green";
+        await createTheatre(theatreData);
+        document.getElementById("message").textContent = "Theatre created!";
         await loadTheatres(container);
     } catch (err) {
-        const message = document.getElementById("message");
-        message.textContent = "Error: " + err.message;
-        message.style.color = "red";
+        document.getElementById("message").textContent = "Error: " + err.message;
     }
 }
 
 async function handleDelete(theatreId, container) {
-    if (confirm("Are you sure you want to delete this theatre?")) {
+    if (confirm("Delete theatre?")) {
         try {
             await deleteTheatre(theatreId);
             await loadTheatres(container);
         } catch (err) {
-            const message = document.getElementById("message");
-            message.textContent = "Error: " + err.message;
-            message.style.color = "red";
+            document.getElementById("message").textContent = "Error: " + err.message;
         }
     }
 }

@@ -2,25 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kino SPA</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="site-wrapper">
 
-<nav class="top-bar">
-    <a href="#/">Home</a>
-    <a href="#/admin">Admin</a>
-    <div id="auth-status" style="float: right;"></div>
-</nav>
+    <div id="header-root"></div>
 
-<div id="app">
-    <h1>Kino</h1>
-    <div id="content">
-        <!-- Content will be injected here -->
-    </div>
-</div>
+    <main id="content" class="site-content">
+        <!-- Page content injected here -->
+    </main>
 
-<script type="module" src="js/router.js"></script>
+    <div id="footer-root"></div>
+
+    <script type="module" src="js/router.js"></script>
 
 </body>
 </html>

@@ -1,5 +1,6 @@
 import {getCategories} from "../services/metadataService.js";
 import {getMovies, createMovie, deleteMovie, getShowingsForMovie} from "../services/moviesService.js";
+import {renderTable} from "../components/Table.js";
 
 async function render(container, params) {
     container.innerHTML = `
@@ -23,9 +24,7 @@ async function render(container, params) {
         <div id="moviesTableContainer"></div>
     `;
 
-    const movieForm = document.getElementById("movieForm");
-    movieForm.addEventListener("submit", (e) => handleSubmit(e, container, params));
-
+    document.getElementById("movieForm").addEventListener("submit", (e) => handleSubmit(e, container));
     await loadCategories();
     await loadMovies(container);
 }
@@ -45,22 +44,22 @@ async function loadCategories() {
     });
 }
 
-async function handleSubmit(event, container, params) {
+async function handleSubmit(event, container) {
     event.preventDefault();
-    const title = document.getElementById("title").value;
-    const ageLimit = parseInt(document.getElementById("ageLimit").value, 10);
-    const duration = parseInt(document.getElementById("duration").value, 10);
-    const categories = Array.from(document.querySelectorAll("#categoriesContainer input:checked")).map(cb => cb.value);
-    const description = document.getElementById("description").value;
+    const movieData = {
+        title: document.getElementById("title").value,
+        ageLimit: parseInt(document.getElementById("ageLimit").value, 10),
+        duration: parseInt(document.getElementById("duration").value, 10),
+        categories: Array.from(document.querySelectorAll("#categoriesContainer input:checked")).map(cb => cb.value),
+        description: document.getElementById("description").value
+    };
 
     try {
-        await createMovie({title, ageLimit, duration, categories, description});
+        await createMovie(movieData);
         document.getElementById("message").textContent = "Movie created!";
-        document.getElementById("message").style.color = "green";
         await loadMovies(container);
     } catch (err) {
         document.getElementById("message").textContent = "Error: " + err.message;
-        document.getElementById("message").style.color = "red";
     }
 }
 
@@ -74,30 +73,14 @@ async function loadMovies(container) {
         return;
     }
 
-    const table = document.createElement("table");
-    const thead = document.createElement("thead");
-    const headerRow = thead.insertRow();
-    ["Title", "Age Limit", "Duration", "Categories", "Description", "Action"].forEach(h => {
-        const th = document.createElement("th");
-        th.textContent = h;
-        headerRow.appendChild(th);
-    });
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-    movies.forEach(movie => {
-        const row = tbody.insertRow();
-        row.insertCell().textContent = movie.title;
-        row.insertCell().textContent = movie.ageLimit;
-        row.insertCell().textContent = movie.duration + " min";
-        row.insertCell().textContent = movie.categories.join(", ");
-        row.insertCell().textContent = movie.description;
-
-        const actionCell = row.insertCell();
+    const headers = ["Title", "Age Limit", "Duration", "Categories", "Action"];
+    const rows = movies.map(movie => {
+        const actions = document.createElement("div");
+        
         const editLink = document.createElement("a");
         editLink.textContent = "Edit";
         editLink.href = `#/admin/edit-movie?id=${movie.movieId}`;
-        actionCell.appendChild(editLink);
+        actions.appendChild(editLink);
 
         const deleteLink = document.createElement("a");
         deleteLink.textContent = "Delete";
@@ -105,24 +88,23 @@ async function loadMovies(container) {
         deleteLink.style.marginLeft = "12px";
         deleteLink.addEventListener("click", async (e) => {
             e.preventDefault();
-            const showings = await getShowingsForMovie(movie.movieId);
-            if (showings.length > 0) {
-                alert("Can't delete movie, because it is included in an existing showing");
-                return;
-            }
-            if (confirm("Are you sure you want to delete this movie?")) {
-                try {
-                    await deleteMovie(movie.movieId);
-                    await loadMovies(container);
-                } catch (err) {
-                    document.getElementById("message").textContent = "Error: " + err.message;
-                }
+            if (confirm("Delete movie?")) {
+                await deleteMovie(movie.movieId);
+                await loadMovies(container);
             }
         });
-        actionCell.appendChild(deleteLink);
+        actions.appendChild(deleteLink);
+
+        return [
+            movie.title,
+            movie.ageLimit,
+            movie.duration + " min",
+            movie.categories.join(", "),
+            actions
+        ];
     });
-    table.appendChild(tbody);
-    tableContainer.appendChild(table);
+
+    tableContainer.appendChild(renderTable(headers, rows));
 }
 
 export default { render };

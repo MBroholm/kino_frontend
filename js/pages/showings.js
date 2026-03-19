@@ -2,6 +2,7 @@ import {getMovies} from "../services/moviesService.js";
 import {getTheatres} from "../services/theatresService.js";
 import {getShowings, createShowing, deleteShowing} from "../services/showingsService.js";
 import {getSeatsForShowing} from "../services/seatsService.js";
+import {renderTable} from "../components/Table.js";
 
 async function render(container, params) {
     container.innerHTML = `
@@ -111,44 +112,23 @@ async function buildTheatreTable(theatreNumber, showings) {
     theatreTitle.textContent = `Theatre ${theatreNumber}`;
     wrapper.appendChild(theatreTitle);
 
-    const table = document.createElement("table");
-    table.classList.add("showings-table");
-    wrapper.appendChild(table);
-
-    const thead = document.createElement("thead");
-    const headerRow = thead.insertRow();
-    ["Movie", "Start Time", "End Time", "Price", "Reserved Seats", "Action"].forEach(h => {
-        const th = document.createElement("th");
-        th.textContent = h;
-        headerRow.appendChild(th);
-    });
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-    table.appendChild(tbody);
-
-    for (const showing of showings.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))) {
-        const row = tbody.insertRow();
-        row.insertCell().textContent = showing.movieTitle;
-        row.insertCell().textContent = formatTime(showing.startTime);
-        row.insertCell().textContent = formatTime(showing.endTime);
-        row.insertCell().textContent = `${showing.price} kr`;
-
-        const reservedSeatsCell = row.insertCell();
+    const headers = ["Movie", "Start Time", "End Time", "Price", "Reserved Seats", "Action"];
+    
+    const rows = await Promise.all(showings.sort((a, b) => new Date(a.startTime) - new Date(b.startTime)).map(async showing => {
         const showingSeats = await getSeatsForShowing(showing.showingId);
-        reservedSeatsCell.textContent = `${showingSeats.filter(s => s.occupied).length} of ${showingSeats.length}`;
-
-        const actionCell = row.insertCell();
+        const reservedText = `${showingSeats.filter(s => s.occupied).length} of ${showingSeats.length}`;
+        
+        const actions = document.createElement("div");
         const editLink = document.createElement("a");
         editLink.textContent = "Edit";
         editLink.href = `#/admin/edit-showing?id=${showing.showingId}`;
-        actionCell.appendChild(editLink);
+        actions.appendChild(editLink);
 
         const bookingLink = document.createElement("a");
         bookingLink.textContent = "Booking";
         bookingLink.href = `#/booking?showingId=${showing.showingId}`;
         bookingLink.style.marginLeft = "12px";
-        actionCell.appendChild(bookingLink);
+        actions.appendChild(bookingLink);
 
         const deleteLink = document.createElement("a");
         deleteLink.textContent = "Delete";
@@ -156,17 +136,24 @@ async function buildTheatreTable(theatreNumber, showings) {
         deleteLink.style.marginLeft = "12px";
         deleteLink.addEventListener("click", async (e) => {
             e.preventDefault();
-            if (confirm("Are you sure you want to delete this showing?")) {
-                try {
-                    await deleteShowing(showing.showingId);
-                    await loadShowings();
-                } catch (err) {
-                    document.getElementById("message").textContent = "Error: " + err.message;
-                }
+            if (confirm("Delete showing?")) {
+                await deleteShowing(showing.showingId);
+                await loadShowings();
             }
         });
-        actionCell.appendChild(deleteLink);
-    }
+        actions.appendChild(deleteLink);
+
+        return [
+            showing.movieTitle,
+            formatTime(showing.startTime),
+            formatTime(showing.endTime),
+            `${showing.price} kr`,
+            reservedText,
+            actions
+        ];
+    }));
+
+    wrapper.appendChild(renderTable(headers, rows));
     return wrapper;
 }
 

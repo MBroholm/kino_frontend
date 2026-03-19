@@ -1,31 +1,125 @@
 /* --------------------------------------------------
-   GLOBAL
+   GLOBAL & LAYOUT
 -------------------------------------------------- */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
 body {
     background: #1a1a1a;
     color: #fff;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sticky Footer Layout */
+.site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.site-content {
+    flex: 1 0 auto;
+    padding: 40px 20px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 /* --------------------------------------------------
    HEADER
 -------------------------------------------------- */
-header {
+.site-header {
+    flex-shrink: 0;
     background: #111;
-    padding: 16px 24px;
+    border-bottom: 1px solid #333;
+    padding: 0 20px;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 1.4rem;
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-header p {
-    margin: 4px 0 0;
-    color: #aaa;
+.logo a {
+    color: #2d8a2d;
+    text-decoration: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a, .auth-status a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover, .auth-status a:hover {
+    color: #2d8a2d;
+}
+
+.auth-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #888;
     font-size: 0.9rem;
+}
+
+/* --------------------------------------------------
+   FOOTER
+-------------------------------------------------- */
+.site-footer {
+    flex-shrink: 0;
+    background: #0d0d0d;
+    border-top: 1px solid #333;
+    padding: 40px 20px;
+    color: #888;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    text-align: center;
+}
+
+.footer-info h3 {
+    color: #fff;
+    margin-top: 0;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-links a {
+    color: #888;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: #fff;
 }
 
 /* --------------------------------------------------
@@ -33,22 +127,25 @@ header p {
 -------------------------------------------------- */
 form {
     background: #111;
-    padding: 20px;
+    padding: 24px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
+    max-width: 600px;
+    margin-bottom: 30px;
 }
 
 label {
     font-size: 0.95rem;
     color: #ccc;
+    margin-bottom: -5px;
 }
 
 input,
 select,
 textarea {
-    padding: 10px;
+    padding: 12px;
     background: #2a2a2a;
     color: #fff;
     border: 1px solid #444;
@@ -56,101 +153,22 @@ textarea {
     font-size: 1rem;
 }
 
-input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #2d8a2d;
-    cursor: pointer;
-}
-
 button,
 #confirmBtn {
-    padding: 10px 16px;
+    padding: 12px 20px;
     background: #2d8a2d;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 1rem;
+    font-weight: bold;
+    transition: background 0.2s;
 }
 
 button:hover:not(:disabled),
 #confirmBtn:hover:not(:disabled) {
     background: #3aaa3a;
-}
-
-button:disabled,
-#confirmBtn:disabled {
-    background: #444;
-    cursor: not-allowed;
-}
-
-#categoriesContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 8px 16px;
-    margin-bottom: 12px;
-}
-
-#categoriesContainer label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-/* --------------------------------------------------
-   LAYOUT
--------------------------------------------------- */
-.booking-layout {
-    display: flex;
-    gap: 32px;
-    padding: 24px;
-    align-items: flex-start;
-}
-
-#sidebar {
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-#seatMapContainer {
-    background: #111;
-    padding: 32px;
-    border-radius: 8px;
-    flex: 1;
-}
-
-#confirmationPanel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 350px;
-    background: #111;
-    border-radius: 8px;
-    box-shadow: 0 0 20px #333;
-    padding: 24px;
-    display: none;
-}
-
-#overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(17, 16, 16, 0.7);
-    display: none;
-}
-
-.theatre-block, #moviesTableContainer{
-    margin-bottom: 40px;
-    background: #111;
-    padding: 20px;
-    border-radius: 8px;
 }
 
 /* --------------------------------------------------
@@ -160,39 +178,136 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: #111;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
+    margin: 20px 0;
 }
 
 table th,
 table td {
-    border: 1px solid #333;
-    padding: 10px;
+    padding: 15px;
+    border-bottom: 1px solid #222;
 }
 
 table th {
-    background: #222;
+    background: #1a1a1a;
     text-align: left;
-    color: #ddd;
-}
-
-table tr:nth-child(even) {
-    background: #1f1f1f;
+    color: #2d8a2d;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
 }
 
 table tr:hover {
-    background: #2a2a2a;
+    background: #181818;
+}
+
+/* --------------------------------------------------
+   BOOKING PAGE LAYOUT
+-------------------------------------------------- */
+.booking-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    margin-top: 30px;
+}
+
+#sidebar {
+    width: 250px;
+    background: #111;
+    padding: 24px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+#seatMapContainer {
+    flex: 1;
+    background: #111;
+    padding: 40px;
+    border-radius: 8px;
+    min-height: 400px;
+}
+
+/* --------------------------------------------------
+   OVERLAY & CONFIRMATION
+-------------------------------------------------- */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#confirmationPanel {
+    background: #1a1a1a;
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+#confirmationPanel ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px auto;
+    text-align: left;
+    display: block;
+    max-width: fit-content;
+}
+
+#confirmationPanel h3 {
+    color: #2d8a2d;
+    font-size: 2rem;
+    margin: 10px 0;
+}
+
+#confirmationPanel p {
+    color: #aaa;
+    margin: 5px 0;
+}
+
+#confirmationPanel li {
+    padding: 8px 12px;
+    background: #222;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    color: #eee;
+    font-size: 0.9rem;
+}
+
+#confirmationPanel button {
+    margin: 10px 5px;
+}
+
+#cancelBtn {
+    background: #444;
+}
+
+#cancelBtn:hover {
+    background: #555;
 }
 
 /* --------------------------------------------------
    SEAT MAP
 -------------------------------------------------- */
 .screen {
-    height: 6px;
-    background: linear-gradient(to bottom, #888, #333);
-    border-radius: 50%;
-    margin: 0 40px 32px;
-    box-shadow: 0 0 12px #666;
+    height: 8px;
+    background: #555;
+    border-radius: 10px;
+    margin: 0 10% 40px;
+    box-shadow: 0 4px 15px rgba(255,255,255,0.1);
 }
 
 .seat-row {
@@ -205,169 +320,103 @@ table tr:hover {
 
 .row-label {
     color: #666;
-    width: 20px;
+    width: 25px;
     text-align: center;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
 }
 
 .seat {
-    width: 26px;
-    height: 26px;
-    border-radius: 4px 4px 0 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px 6px 2px 2px;
+    background: #2d8a2d;
     border: none;
     cursor: pointer;
-    background: #2d8a2d;
-    transition: background 0.15s;
+    transition: background 0.2s;
 }
 
-.seat:hover:not(:disabled) {
-    background: #3aaa3a;
-}
-
-.seat.selected {
-    background: #1a6bb5;
-}
-
-.seat.selected:hover {
-    background: #2278cc;
-}
-
-.seat.occupied {
-    background: #8b0000;
-    cursor: not-allowed;
-}
+.seat:hover:not(:disabled) { background: #3aaa3a; }
+.seat.selected { background: #1a6bb5; }
+.seat.occupied { background: #8b0000; cursor: not-allowed; opacity: 1; }
 
 /* --------------------------------------------------
-   LEGEND
+   SHOWINGS (on Movie Page)
 -------------------------------------------------- */
-.legend {
-    display: flex;
-    gap: 16px;
-    margin-top: 24px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    color: #aaa;
-}
-
-.legend-dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
-}
-
-/* --------------------------------------------------
-   Movie-cards
--------------------------------------------------- */
-
-.movie-card {
-    background: #1f1f1f;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 16px;
-    transition: background 0.2s, transform 0.15s;
-}
-
-.movie-card:hover {
-    background: #2a2a2a;
-    transform: translateY(-2px);
-}
-
-#moviesContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
-}
-
-/* --------------------------------------------------
-   Movie-page
--------------------------------------------------- */
-
-.movie-container {
-    max-width: 700px;
-    margin: auto;
-    background: #111;
-    padding: 24px;
-    border-radius: 8px;
-}
-
-.categories {
-    margin: 12px 0;
-}
-
-.category-tag {
-    display: inline-block;
-    background: #333;
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-right: 6px;
-    font-size: 0.85rem;
-}
-
-.meta {
-    color: #aaa;
-    margin-bottom: 16px;
-}
-
 .showing-date {
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .showing-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 12px;
+    gap: 15px;
+    margin-top: 15px;
 }
 
 .showing-item {
-    background: #1f1f1f;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 12px 16px;
-    min-width: 140px;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 15px 20px;
+    min-width: 150px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
+    transition: transform 0.2s, border-color 0.2s;
     text-align: center;
 }
 
 .showing-item:hover {
-    background: #2a2a2a;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    border-color: #2d8a2d;
 }
 
 .showing-time {
     font-weight: bold;
+    font-size: 1.1rem;
     color: #fff;
 }
 
 .showing-theatre {
-    color: #aaa;
-    font-size: 0.85rem;
-}
-
-.top-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px 20px;
-}
-
-.top-bar a {
-    color: #aaa;
-    text-decoration: none;
+    color: #888;
     font-size: 0.9rem;
 }
 
-.top-bar a:hover {
-    color: #3aaa3a;
+.meta {
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
 }
 
+/* --------------------------------------------------
+   MOVIE CARDS
+-------------------------------------------------- */
+.movie-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+    border-color: #2d8a2d;
+}
+
+#moviesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.category-tag {
+    background: #222;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-right: 5px;
+    color: #aaa;
+}
