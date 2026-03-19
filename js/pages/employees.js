@@ -1,5 +1,6 @@
 import {createEmployee, deleteEmployee, getEmployees} from '../services/employeesService.js';
 import {getCurrentUsername} from "../auth.js";
+import {renderTable} from "../components/Table.js";
 
 async function render(container, params) {
     container.innerHTML = `
@@ -23,7 +24,7 @@ async function render(container, params) {
         </form>
         <div id="message"></div>
         <h2>Current Employees</h2>
-        <div id="employeesContainer"></div>
+        <div id="employeesTableContainer"></div>
     `;
 
     document.getElementById("employeeForm").addEventListener("submit", (e) => handleSubmit(e, container));
@@ -32,14 +33,16 @@ async function render(container, params) {
 
 async function loadEmployees(container) {
     const employees = await getEmployees();
-    const employeesContainer = document.getElementById("employeesContainer");
-    employeesContainer.innerHTML = "";
+    const tableContainer = document.getElementById("employeesTableContainer");
+    tableContainer.innerHTML = "";
     
-    employees.forEach(employee => {
-        const employeeDiv = document.createElement("div");
-        employeeDiv.classList.add("employee-card");
-        employeeDiv.innerHTML = `<h3>${employee.username}</h3>`;
-        
+    if (employees.length === 0) {
+        tableContainer.textContent = "No employees found.";
+        return;
+    }
+
+    const headers = ["Username", "Roles", "Action"];
+    const rows = employees.map(employee => {
         const actions = document.createElement("div");
         
         const editBtn = document.createElement("button");
@@ -55,20 +58,24 @@ async function loadEmployees(container) {
             actions.appendChild(deleteBtn);
         }
 
-        employeeDiv.appendChild(actions);
-        employeesContainer.appendChild(employeeDiv);
+        return [
+            employee.username,
+            employee.roles.join(", "),
+            actions
+        ];
     });
+
+    tableContainer.appendChild(renderTable(headers, rows));
 }
 
 async function handleDelete(employeeId, container) {
-    if (confirm("Are you sure you want to delete this employee?")) {
+    if (confirm("Delete employee?")) {
         try {
             await deleteEmployee(employeeId);
             await loadEmployees(container);
         } catch (err) {
             const message = document.getElementById("message");
             message.textContent = "Error: " + err.message;
-            message.style.color = "red";
         }
     }
 }
@@ -88,11 +95,9 @@ async function handleSubmit(event, container) {
     try {
         await createEmployee({ username, password, roles: [role] });
         document.getElementById("message").textContent = "Employee created!";
-        document.getElementById("message").style.color = "green";
         await loadEmployees(container);
     } catch (err) {
         document.getElementById("message").textContent = "Error: " + err.message;
-        document.getElementById("message").style.color = "red";
     }
 }
 
